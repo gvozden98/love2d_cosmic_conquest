@@ -40,7 +40,7 @@ function Player:update(dt)
             Bomb:update(dt)
             if Bomb.bomby <= -16 then
                 Bomb.remove = true
-                print(#self.bombs)
+                --print(#self.bombs)
             end
         end
     end

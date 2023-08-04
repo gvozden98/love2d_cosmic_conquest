@@ -3,11 +3,14 @@ _G.love = require("love")
 require 'lib/class'
 local push = require 'lib/push'
 require "src/Player"
+require "src/Enemy"
 
 -- constants
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
 local player = Player()
+local enemy = Enemy()
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
@@ -17,11 +20,23 @@ end
 function love.update(dt)
     player:update(dt)
 
+
+
     --love.keyboard.keysPressed = {}
+
+    if enemy:collides(player) == true then
+        --stop = true
+        --print("damage")
+    end
 end
 
 function love.draw()
     player:render()
+    for i = 32, 600, 64 do
+        enemy:render(3, i, 64)
+        enemy.x = i
+        enemy.y = 64
+    end
 end
 
 --[[adding a function to the keyboard table to check if keyboard was pressed,
