@@ -1,25 +1,22 @@
 Enemy = class {}
 
-function Enemy:init()
-    self.spritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
-    self.quads = {}
-    for y = 0, 1 do
-        for x = 0, 3 do
-            self.quads[#self.quads + 1] = love.graphics.newQuad(x * 32, y * 32, 32, 32, self.spritesheet:getDimensions())
-        end
-    end
+function Enemy:init(quad, x, y)
+    self.quad = quad
     self.width = 32
     self.height = 32
-    self.x = 0
-    self.y = 0
+    self.x = x
+    self.y = y
+    self.collided = false
 end
 
 function Enemy:update(dt)
 
 end
 
-function Enemy:render(spriteIndex, x, y)
-    love.graphics.draw(self.spritesheet, self.quads[spriteIndex], x, y)
+function Enemy:render()
+    if not self.collided then
+        love.graphics.draw(spritesheet, self.quad, self.x, self.y)
+    end
 end
 
 function Enemy:collides(player)
@@ -27,6 +24,7 @@ function Enemy:collides(player)
         if self.y + self.height >= bomb.bomby + 3 and bomb.bomby + 3 <= self.y + self.height then
             if self.x + self.width >= bomb.bombx + 3 and bomb.bombx + 3 <= self.x + self.width then
                 print("hit")
+                self.collided = true
                 return true
             end
         else
