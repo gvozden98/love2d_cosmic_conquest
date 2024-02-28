@@ -1,6 +1,8 @@
+
 Enemy = class {}
 
 function Enemy:init(quad, x, y)
+    self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.quad = quad
     self.width = 32
     self.height = 32
@@ -10,14 +12,15 @@ function Enemy:init(quad, x, y)
 end
 
 function Enemy:update(dt)
-
 end
 
 function Enemy:render()
-    --if not self.collided then
-    love.graphics.draw(spritesheet, self.quad, self.x, self.y)
-    --end
+    if not self.collided then
+        love.graphics.draw(self.enemySpritesheet, self.quad, self.x, self.y)
+    end
 end
+
+
 
 -- Collision detection function;
 -- Returns true if two boxes overlap, false if they don't;
@@ -36,7 +39,9 @@ function Enemy:collides(player)
             self.y < bomb.bomby + 3 and
             bomb.bomby < self.y + self.height
         then
+            --if collided then remove the bomb
             self.collided = true
+            bomb.remove = true
         end
     end
 end
