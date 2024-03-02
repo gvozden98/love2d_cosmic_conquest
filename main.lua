@@ -1,6 +1,6 @@
 --[[
-    TODO: Enemies should all be separated, sprites should be loaded once, not every time i initialize an object, state machine needs to be made and levels should be added
-    If enemies to the left are shot, all of them dissapear, most likely need to change the collides method
+    TODO: Enemies get their projectiles destroyed when they are destroyed, that needs fixing
+
 ]]
 --[[
     Every single sprite and animation should be watched seperately, and all the same ones should be in a single table
@@ -24,11 +24,10 @@ WINDOW_HEIGHT = 800
 local player = Player()
 local newEnemies = Enemies()
 newEnemies:getSprite()
-newEnemies:Populate(32)
+newEnemies:Populate(32, 4)
 local enemies = newEnemies.enemies
 local explosions = {}
-
-
+local playerExplosion = Explosion(player.x, player.y, 2)
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
@@ -37,20 +36,29 @@ function love.load()
 end
 
 function love.update(dt)
-    player:update(dt)
-
     --check collision with the enemies
-    for key, enemie in pairs(enemies) do
-        enemie:collides(player)
-        if enemie.collided == true then
+
+    -- if player.collided == true then
+    --     playerExplosion = Explosion(player.x, player.y, 2)
+    -- end
+    player:update(dt)
+    for key, enemy in pairs(enemies) do
+        enemy:collides(player)
+        enemy:collidesWithPlayer(player)
+        enemy:update(dt)
+        enemy:shoot(dt)
+        if enemy.collided == true then
             table.remove(enemies, key)
-            table.insert(explosions, Explosion(enemie.x, enemie.y))
+            table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
         end
     end
     --explode the ships if they have been hit
     for key, explosion in pairs(explosions) do
         explosion:update(dt)
     end
+    -- if player.collided == true then
+    --     playerExplosion:update(dt)
+    -- end
 end
 
 function love.draw()
@@ -58,9 +66,13 @@ function love.draw()
     for key, enemy in pairs(enemies) do
         enemy:render()
     end
-    for key, explsion in pairs(explosions) do
-        explsion:render()
+    for key, explosion in pairs(explosions) do
+        explosion:render()
     end
+
+    -- if player.collided then
+    --     playerExplosion:render()
+    -- end
 end
 
 --[[adding a function to the keyboard table to check if keyboard was pressed,
@@ -80,7 +92,7 @@ function love.keypressed(key)
         love.event.quit()
     end
     --if not player.shooting then
-    if key == 'space' then
+    if key == 'space' and not player.collided then
         player:shoot()
     end
     --end
