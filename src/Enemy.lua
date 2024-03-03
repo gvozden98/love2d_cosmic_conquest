@@ -16,7 +16,7 @@ function Enemy:init(quad, x, y)
     --shooting variables
     self.timer = 0
     self.minInterval = 2
-    self.maxInterval = 10
+    self.maxInterval = 4
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 end
 

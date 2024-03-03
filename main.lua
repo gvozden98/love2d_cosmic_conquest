@@ -24,8 +24,9 @@ local levels = require "/src/Level"
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
 local currentLevel = 1
+local gameState = ""
+local transitionTimer = 0
 local player = Player()
-
 local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
@@ -36,48 +37,80 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
     love.keyboard.keysPressed = {}
+    gameState = "start"
     LoadLevel(currentLevel)
+    _G.titlefont = love.graphics.newFont('fonts/font.ttf', 34)
+    _G.pressKeyFont = love.graphics.newFont('fonts/font.ttf', 20)
 end
 
 function love.update(dt)
     --check collision with the enemies
+
     player:update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
-    
-    for key, enemy in pairs(enemies) do
-        enemy:collides(player)
-        enemy:shoot(dt)
-        if enemy.collided == true then
-            table.remove(enemies, key)
-            table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
-        end
-        if enemy.collided and enemy.shooting then
-            for key, removedEnemyBomb in pairs(removedEnemyBombs) do
-                print("bomb added " .. " " .. removedEnemyBomb.bombx .. " " .. key)
+    if gameState == "fight" then
+        for key, enemy in pairs(enemies) do
+            enemy:collides(player)
+            enemy:shoot(dt)
+            if enemy.collided == true then
+                table.remove(enemies, key)
+                table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
+            end
+            if enemy.collided and enemy.shooting then
+                for key, removedEnemyBomb in pairs(removedEnemyBombs) do
+                    print("bomb added " .. " " .. removedEnemyBomb.bombx .. " " .. key)
+                end
             end
         end
+        --explode the ships if they have been hit
     end
-    --explode the ships if they have been hit
-    for key, explosion in pairs(explosions) do
-        explosion:update(dt)
-    end
-end
 
-function love.draw()
-    player:render()
-    for key, enemy in pairs(enemies) do
-        enemy:render()
+    if gameState == "transition" then
+        transitionTimer = transitionTimer + dt
+        print(transitionTimer)
+        if transitionTimer > 3 then
+            print(transitionTimer)
+            gameState = "fight"
+            transitionTimer = 0
+        end
     end
-    for key, explosion in pairs(explosions) do
-        explosion:render()
-    end
-    AllEnemyBombs:render()
 
     if WinConditionMet() == true then
         print(currentLevel)
         currentLevel = currentLevel + 1
         LoadLevel(currentLevel)
+        gameState = "transition"
+    end
+    for key, explosion in pairs(explosions) do
+        explosion:update(dt)
+    end
+    if player.collided then
+        gameState = "dead"
+    end
+end
+
+function love.draw()
+    player:render()
+    if gameState == "fight" or gameState == "dead" then
+        for key, enemy in pairs(enemies) do
+            enemy:render()
+        end
+    end
+    for key, explosion in pairs(explosions) do
+        explosion:render()
+    end
+    AllEnemyBombs:render()
+    
+    if gameState == "start" then
+        love.graphics.setFont(titlefont)
+        love.graphics.printf('Cosmic Conquest', 0, 400, WINDOW_WIDTH, 'center')
+        love.graphics.setFont(pressKeyFont)
+        love.graphics.printf('Press Enter to start', 0, 450, WINDOW_WIDTH, 'center')
+    end
+    if gameState == "dead" then
+        love.graphics.setFont(titlefont)
+        love.graphics.printf('Game Over', 0, 400, WINDOW_WIDTH, 'center')
     end
 end
 
@@ -98,12 +131,17 @@ function love.keypressed(key)
         love.event.quit()
     end
     --if not player.shooting then
-    if key == 'space' and not player.collided then
+    if key == 'space' and not player.collided and gameState == "fight" then
         player:shoot()
     end
     --end
 
     --love.keyboard.isDown() cannot keep track of pressed keys in other classes besides main
+    if gameState == "start" then
+        if key == 'return' then
+            gameState = "fight"
+        end
+    end
 end
 
 function LoadLevel(level)
