@@ -16,7 +16,7 @@ function Enemies:getSprite()
 end
 
 --populate a level with rows of enemies, starting from startX pixels from the left and separated by 64 pixels from the top
-function Enemies:Populate(startX, rows)
+function Enemies:populate(startX, rows)
     while rows > 0 do
         for i = startX, 600, 64 do
             table.insert(self.enemies, Enemy(self.quads[1], i, rows * 64))

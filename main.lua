@@ -17,23 +17,26 @@ require "/src/Enemy"
 require "/src/Explosion"
 require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
+require "/src/Level"
+local levels = require "/src/Level"
 
--- constants
+
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
+local currentLevel = 1
 local player = Player()
-local newEnemies = Enemies()
-newEnemies:getSprite()
-newEnemies:Populate(32, 4)
-local enemies = newEnemies.enemies
+
+local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
 local removedEnemyBombs = {}
+
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
     love.keyboard.keysPressed = {}
+    LoadLevel(currentLevel)
 end
 
 function love.update(dt)
@@ -41,6 +44,7 @@ function love.update(dt)
     player:update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
+    
     for key, enemy in pairs(enemies) do
         enemy:collides(player)
         enemy:shoot(dt)
@@ -69,6 +73,12 @@ function love.draw()
         explosion:render()
     end
     AllEnemyBombs:render()
+
+    if WinConditionMet() == true then
+        print(currentLevel)
+        currentLevel = currentLevel + 1
+        LoadLevel(currentLevel)
+    end
 end
 
 --[[adding a function to the keyboard table to check if keyboard was pressed,
@@ -94,4 +104,24 @@ function love.keypressed(key)
     --end
 
     --love.keyboard.isDown() cannot keep track of pressed keys in other classes besides main
+end
+
+function LoadLevel(level)
+    -- Load level data (enemy types, positions, etc.)
+    -- Set up initial game state for the given level
+    local currentLevelData = levels[level]
+    currentLevelData:populate()
+    enemies = currentLevelData.generatedEnemies
+    print(#currentLevelData.generatedEnemies)
+end
+
+function WinConditionMet()
+    -- Define win conditions based on your game's rules
+    -- For example, return true if all enemies are destroyed
+    if #enemies == 0 then
+        print("all enemies are dead")
+        return true
+    else
+        return false
+    end
 end
