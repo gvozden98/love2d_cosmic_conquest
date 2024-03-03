@@ -18,10 +18,10 @@ function EnemyBomb:init(enemyX, enemyY)
     self.bomby = enemyY + initialY
 end
 
-function EnemyBomb:update(dt, shotX)
-    --self.bombdy = 500
-    --self.bomby = self.bomby + self.bombdy * dt
-
+function EnemyBomb:update(dt)
+    if self.bomby >= 820 then
+        self.remove = true
+    end
     local deltaX = math.cos(self.angle) * self.bombdy * dt
     local deltaY = math.sin(self.angle) * self.bombdy * dt
 
@@ -30,5 +30,19 @@ function EnemyBomb:update(dt, shotX)
 end
 
 function EnemyBomb:render()
-    love.graphics.draw(self.bomb, self.bombx, self.bomby)
+    if not self.remove then
+        love.graphics.draw(self.bomb, self.bombx, self.bomby)
+    end
+end
+
+function EnemyBomb:collidesWithPlayer(player)
+    if player.x < self.bombx + 3 and
+        self.bombx < player.x + player.width and
+        player.y < self.bomby + 3 and
+        self.bomby < player.y + player.height
+    then
+        --if collided then remove the bomb
+        player.collided = true
+        self.remove = true
+    end
 end

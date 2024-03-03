@@ -15,8 +15,8 @@ require "/src/Player"
 require "/src/Enemies"
 require "/src/Enemy"
 require "/src/Explosion"
-
-
+require "/src/EnemyBomb"
+require "/src/AllEnemyBombs"
 
 -- constants
 WINDOW_WIDTH = 600
@@ -26,8 +26,9 @@ local newEnemies = Enemies()
 newEnemies:getSprite()
 newEnemies:Populate(32, 4)
 local enemies = newEnemies.enemies
+_G.allEnemyBombs = {}
 local explosions = {}
-local playerExplosion = Explosion(player.x, player.y, 2)
+local removedEnemyBombs = {}
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
@@ -37,28 +38,26 @@ end
 
 function love.update(dt)
     --check collision with the enemies
-
-    -- if player.collided == true then
-    --     playerExplosion = Explosion(player.x, player.y, 2)
-    -- end
     player:update(dt)
+    AllEnemyBombs:update(dt)
+    AllEnemyBombs:collidesWithPlayer(player)
     for key, enemy in pairs(enemies) do
         enemy:collides(player)
-        enemy:collidesWithPlayer(player)
-        enemy:update(dt)
         enemy:shoot(dt)
         if enemy.collided == true then
             table.remove(enemies, key)
             table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
+        end
+        if enemy.collided and enemy.shooting then
+            for key, removedEnemyBomb in pairs(removedEnemyBombs) do
+                print("bomb added " .. " " .. removedEnemyBomb.bombx .. " " .. key)
+            end
         end
     end
     --explode the ships if they have been hit
     for key, explosion in pairs(explosions) do
         explosion:update(dt)
     end
-    -- if player.collided == true then
-    --     playerExplosion:update(dt)
-    -- end
 end
 
 function love.draw()
@@ -69,10 +68,7 @@ function love.draw()
     for key, explosion in pairs(explosions) do
         explosion:render()
     end
-
-    -- if player.collided then
-    --     playerExplosion:render()
-    -- end
+    AllEnemyBombs:render()
 end
 
 --[[adding a function to the keyboard table to check if keyboard was pressed,

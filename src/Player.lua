@@ -17,12 +17,14 @@ function Player:init()
 
     self.shotX = 0
     self.bombs = {}
-    self.explosion = Explosion(self.x, self.y, 8)
+    self.explosion = Explosion(self.x, self.y, 2)
     self.shooting = false
     self.collided = false
 end
 
 function Player:update(dt)
+    self.explosion.x = self.x
+    self.explosion.y = self.y
     if not self.collided then
         if love.keyboard.isDown('left') then
             if self.x <= self.width / 2 then
@@ -55,8 +57,7 @@ function Player:update(dt)
             end
         end
     else
-        self.explosion.x = self.x
-        self.explosion.y = self.y
+        --track the explosion to be at the place of the ship
         self.explosion:update(dt)
     end
 end

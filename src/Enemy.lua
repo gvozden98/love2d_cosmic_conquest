@@ -11,37 +11,22 @@ function Enemy:init(quad, x, y)
     self.collided = false
     self.shotX = 0
     self.bombs = {}
+    self.shooting = false
 
     --shooting variables
     self.timer = 0
-    self.minInterval = 1
+    self.minInterval = 2
     self.maxInterval = 10
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 end
 
 function Enemy:update(dt)
-    for _, Bomb in ipairs(self.bombs) do
-        Bomb:update(dt)
-        if Bomb.bomby >= 820 then
-            Bomb.remove = true
-        end
-    end
 
-    --remove bomb if it has gone past the screen
-    for index, Bomb in ipairs(self.bombs) do
-        if Bomb.remove == true then
-            table.remove(self.bombs, index)
-        end
-    end
 end
 
 function Enemy:render()
     if not self.collided then
         love.graphics.draw(self.enemySpritesheet, self.quad, self.x, self.y)
-    end
-
-    for index, bomb in ipairs(self.bombs) do
-        bomb:render()
     end
 end
 
@@ -69,28 +54,13 @@ function Enemy:collides(player)
     end
 end
 
-function Enemy:collidesWithPlayer(player)
-    for index, enemyBomb in pairs(self.bombs) do
-        if player.x < enemyBomb.bombx + 3 and
-            enemyBomb.bombx < player.x + player.width and
-            player.y < enemyBomb.bomby + 3 and
-            enemyBomb.bomby < player.y + player.height
-        then
-            --if collided then remove the bomb
-            player.collided = true
-            enemyBomb.remove = true
-            player.collided = true
-        end
-    end
-end
-
 function Enemy:shoot(dt)
     self.timer = self.timer + dt
     if self.timer >= self.interval then
-        print("Action performed!")
-
+        --print("Action performed!")
+        self.shooting = true
         self.shotX = self.x
-        table.insert(self.bombs, EnemyBomb(self.shotX, self.y))
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y))
         self.timer = 0
     end
 end
