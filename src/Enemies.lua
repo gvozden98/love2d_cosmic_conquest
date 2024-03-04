@@ -1,9 +1,10 @@
 require '/src/Enemy'
 Enemies = class {}
-function Enemies:init()
+function Enemies:init(type)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.enemies = {}
     self.quads = {}
+    self.type = type or 1
 end
 
 function Enemies:getSprite()
@@ -19,7 +20,7 @@ end
 function Enemies:populate(startX, rows)
     while rows > 0 do
         for i = startX, 600, 64 do
-            table.insert(self.enemies, Enemy(self.quads[1], i, rows * 64))
+            table.insert(self.enemies, Enemy(self.quads[self.type], i, rows * 64))
         end
         rows = rows - 1
     end
