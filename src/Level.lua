@@ -11,9 +11,11 @@ function Level:init(enemies, startingXWhereEnemiesSpawn, numberOfRowsOfEnemies, 
 end
 
 function Level:populate()
+    print(#self.generatedEnemies)
     self.enemies:getSprite() -- need to modify populate function to choose a sprite
     self.enemies:populate(self.startingXWhereEnemiesSpawn, self.numberOfRowsOfEnemies)
-    self.generatedEnemies = self.enemies.enemies    
+    self.generatedEnemies = self.enemies.enemies
+    print(#self.generatedEnemies)
 end
 
 return {

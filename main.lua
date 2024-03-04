@@ -1,5 +1,5 @@
 --[[
-    TODO: Enemies get their projectiles destroyed when they are destroyed, that needs fixing
+    TODO: Need to implement the win state and add more levels
 
 ]]
 --[[
@@ -19,7 +19,7 @@ require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
 require "/src/Level"
 local levels = require "/src/Level"
-
+local background = love.graphics.newImage("/assets/sprites/Space Background_800x600.png")
 
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
@@ -88,9 +88,11 @@ function love.update(dt)
     if player.collided then
         gameState = "dead"
     end
+    --print(gameState)
 end
 
 function love.draw()
+    love.graphics.draw(background)
     player:render()
     if gameState == "fight" or gameState == "dead" then
         for key, enemy in pairs(enemies) do
@@ -101,7 +103,7 @@ function love.draw()
         explosion:render()
     end
     AllEnemyBombs:render()
-    
+
     if gameState == "start" then
         love.graphics.setFont(titlefont)
         love.graphics.printf('Cosmic Conquest', 0, 400, WINDOW_WIDTH, 'center')
@@ -111,6 +113,8 @@ function love.draw()
     if gameState == "dead" then
         love.graphics.setFont(titlefont)
         love.graphics.printf('Game Over', 0, 400, WINDOW_WIDTH, 'center')
+        love.graphics.setFont(pressKeyFont)
+        love.graphics.printf('Press Enter to restart', 0, 450, WINDOW_WIDTH, 'center')
     end
 end
 
@@ -131,7 +135,7 @@ function love.keypressed(key)
         love.event.quit()
     end
     --if not player.shooting then
-    if key == 'space' and not player.collided and gameState == "fight" then
+    if key == 'space' and not player.collided then
         player:shoot()
     end
     --end
@@ -139,6 +143,16 @@ function love.keypressed(key)
     --love.keyboard.isDown() cannot keep track of pressed keys in other classes besides main
     if gameState == "start" then
         if key == 'return' then
+            gameState = "fight"
+        end
+    end
+    if gameState == "dead" then
+        if key == 'return' then
+            levels[currentLevel].enemies.enemies = {}
+            player = Player()
+            currentLevel = 1
+            _G.allEnemyBombs = {}
+            LoadLevel(currentLevel)
             gameState = "fight"
         end
     end
@@ -150,7 +164,7 @@ function LoadLevel(level)
     local currentLevelData = levels[level]
     currentLevelData:populate()
     enemies = currentLevelData.generatedEnemies
-    print(#currentLevelData.generatedEnemies)
+    --print(#currentLevelData.generatedEnemies)
 end
 
 function WinConditionMet()

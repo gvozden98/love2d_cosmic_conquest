@@ -5,6 +5,11 @@ Player = class {}
 
 function Player:init()
     self.spritesheet = love.graphics.newImage("assets/sprites/spaceships.png")
+    --thruster
+    self.thruster = love.graphics.newImage("assets/sprites/thruster-Sheet2.png")
+    self.grid = anim8.newGrid(16, 16, self.thruster:getWidth(), self.thruster:getHeight())
+    self.firstAnimation = anim8.newAnimation(self.grid('1-5', 1), 0.08)
+    --
     self.player1 = love.graphics.newQuad(0, 0, 48, 48, self.spritesheet:getDimensions())
     self.player2 = love.graphics.newQuad(48, 0, 48, 48, self.spritesheet:getDimensions())
     self.player3 = love.graphics.newQuad(0, 48, 48, 48, self.spritesheet:getDimensions())
@@ -23,6 +28,7 @@ function Player:init()
 end
 
 function Player:update(dt)
+    self.firstAnimation:update(dt)
     self.explosion.x = self.x
     self.explosion.y = self.y
     if not self.collided then
@@ -65,6 +71,7 @@ end
 function Player:render()
     -- can not get width of quad for some reason
     if not self.collided then
+        self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
     else
         self.explosion:render()
