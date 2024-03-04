@@ -25,6 +25,9 @@ function Player:init()
     self.explosion = Explosion(self.x, self.y, 2)
     self.shooting = false
     self.collided = false
+    --auto shooting
+    self.fireRate = 1.5
+    self.timer = 0
 end
 
 function Player:update(dt)
@@ -86,12 +89,18 @@ function Player:render()
     end
 end
 
+function Player:autoShoot(dt)
+    self.timer = self.timer + dt
+    if self.timer >= self.fireRate then
+        self.shooting = true
+        self.shotX = self.x
+        table.insert(self.bombs, Bomb(self.shotX))
+        self.timer = 0
+    end
+end
+
 function Player:shoot()
     self.shooting = true
     self.shotX = self.x
     table.insert(self.bombs, Bomb(self.shotX))
 end
-
--- function Player:collides()
-
--- end

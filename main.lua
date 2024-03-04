@@ -32,7 +32,6 @@ _G.allEnemyBombs = {}
 local explosions = {}
 local removedEnemyBombs = {}
 
-
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
@@ -53,6 +52,7 @@ function love.update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
     if gameState == "fight" then
+        player:autoShoot(dt)
         for key, enemy in pairs(enemies) do
             enemy:collides(player)
             enemy:shoot(dt)
@@ -144,6 +144,9 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
+    --Shooting on click
+
     --if not player.shooting then
     if key == 'space' and not player.collided and gameState == "fight" then
         player:shoot()
