@@ -20,7 +20,8 @@ end
 
 return {
     Level(Enemies(), 32, 1),
-    Level(Enemies(), 32, 2),
-    Level(Enemies(), 32, 3)
+    Level(Enemies(), 32, 1),
+    Level(Enemies(), 32, 1),
+    Level(Enemies(), 32, 1),
 
 }

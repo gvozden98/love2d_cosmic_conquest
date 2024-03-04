@@ -45,7 +45,10 @@ end
 
 function love.update(dt)
     --check collision with the enemies
-
+    if currentLevel > #levels - 1 then
+        gameState = "finish"
+    end
+    print(#enemies .. " " .. currentLevel)
     player:update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
@@ -68,9 +71,9 @@ function love.update(dt)
 
     if gameState == "transition" then
         transitionTimer = transitionTimer + dt
-        print(transitionTimer)
+        --print(transitionTimer)
         if transitionTimer > 3 then
-            print(transitionTimer)
+            --print(transitionTimer)
             gameState = "fight"
             transitionTimer = 0
         end
@@ -88,7 +91,8 @@ function love.update(dt)
     if player.collided then
         gameState = "dead"
     end
-    --print(gameState)
+    print(gameState)
+    --print(#levels)
 end
 
 function love.draw()
@@ -116,6 +120,12 @@ function love.draw()
         love.graphics.setFont(pressKeyFont)
         love.graphics.printf('Press Enter to restart', 0, 450, WINDOW_WIDTH, 'center')
     end
+    if gameState == "finish" then
+        love.graphics.setFont(titlefont)
+        love.graphics.printf('Congratulations', 0, 400, WINDOW_WIDTH, 'center')
+        love.graphics.setFont(pressKeyFont)
+        love.graphics.printf('Press Enter to restart', 0, 450, WINDOW_WIDTH, 'center')
+    end
 end
 
 --[[adding a function to the keyboard table to check if keyboard was pressed,
@@ -135,7 +145,7 @@ function love.keypressed(key)
         love.event.quit()
     end
     --if not player.shooting then
-    if key == 'space' and not player.collided then
+    if key == 'space' and not player.collided and gameState == "fight" then
         player:shoot()
     end
     --end
@@ -156,14 +166,26 @@ function love.keypressed(key)
             gameState = "fight"
         end
     end
+    if gameState == "finish" then
+        if key == 'return' then
+            levels[currentLevel].enemies.enemies = {}
+            player = Player()
+            currentLevel = 1
+            _G.allEnemyBombs = {}
+            LoadLevel(currentLevel)
+            gameState = "fight"
+        end
+    end
 end
 
 function LoadLevel(level)
     -- Load level data (enemy types, positions, etc.)
     -- Set up initial game state for the given level
+
     local currentLevelData = levels[level]
     currentLevelData:populate()
     enemies = currentLevelData.generatedEnemies
+
     --print(#currentLevelData.generatedEnemies)
 end
 
@@ -171,7 +193,7 @@ function WinConditionMet()
     -- Define win conditions based on your game's rules
     -- For example, return true if all enemies are destroyed
     if #enemies == 0 then
-        print("all enemies are dead")
+        --print("all enemies are dead")
         return true
     else
         return false
