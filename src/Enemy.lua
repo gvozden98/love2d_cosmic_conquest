@@ -16,7 +16,7 @@ function Enemy:init(quad, x, y)
     --shooting variables
     self.timer = 0
     self.minInterval = 2
-    self.maxInterval = 4
+    self.maxInterval = 6
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 end
 
@@ -47,7 +47,9 @@ function Enemy:collides(player)
             self.y < bomb.bomby + 3 and
             bomb.bomby < self.y + self.height
         then
-            --if collided then remove the bomb
+            sounds['boom']:stop()
+            sounds['boom']:setVolume(0.4)
+            sounds['boom']:play()
             self.collided = true
             bomb.remove = true
         end
@@ -57,10 +59,14 @@ end
 function Enemy:shoot(dt)
     self.timer = self.timer + dt
     if self.timer >= self.interval then
-        --print("Action performed!")
         self.shooting = true
         self.shotX = self.x
         table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y))
         self.timer = 0
+        sounds['enemy_shoot']:stop()
+        sounds['enemy_shoot']:setVolume(0.5)
+        sounds['enemy_shoot']:play()
     end
 end
+
+

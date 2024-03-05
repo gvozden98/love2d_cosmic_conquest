@@ -19,7 +19,9 @@ require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
 require "/src/Level"
 local levels = require "/src/Level"
-local background = love.graphics.newImage("/assets/sprites/Space Background_800x600.png")
+local background = love.graphics.newImage("/assets/sprites/Space Background_long.png")
+local backgroundY = -2200
+local backgroundSpeed = 200
 
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
@@ -31,6 +33,7 @@ local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
 local removedEnemyBombs = {}
+local finish = false
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
@@ -38,14 +41,27 @@ function love.load()
     love.keyboard.keysPressed = {}
     gameState = "start"
     LoadLevel(currentLevel)
+    --fonts
     _G.titlefont = love.graphics.newFont('fonts/font.ttf', 34)
     _G.pressKeyFont = love.graphics.newFont('fonts/font.ttf', 20)
+    --sounds
+    _G.sounds = {
+        ['boom'] = love.audio.newSource('sounds/boom.wav', 'static'),
+        ['enemy_shoot'] = love.audio.newSource('sounds/enemyshoot.wav', 'static'),
+        ['finish'] = love.audio.newSource('sounds/finish.wav', 'static'),
+        ['player_dead'] = love.audio.newSource('sounds/playerdead.wav', 'static'),
+        ['shoot'] = love.audio.newSource('sounds/shoot.wav', 'static'),
+        ['transition'] = love.audio.newSource('sounds/transition.wav', 'static')
+    }
 end
 
 function love.update(dt)
     --check collision with the enemies
     if currentLevel > #levels - 1 then
         gameState = "finish"
+        if finish == false then
+            finishSound()
+        end
     end
     print(#enemies .. " " .. currentLevel)
     player:update(dt)
@@ -71,8 +87,21 @@ function love.update(dt)
 
     if gameState == "transition" then
         transitionTimer = transitionTimer + dt
-        --print(transitionTimer)
-        if transitionTimer > 3 then
+        sounds['transition']:setVolume(0.8)
+        sounds['transition']:play()
+        --move the background
+        backgroundY = backgroundY + backgroundSpeed * dt
+        if backgroundY > background:getHeight() then
+            backgroundY = 0
+        end
+        --speed up the bombs 
+        for key, bomb in pairs(allEnemyBombs) do
+            bomb.bombdy = 1000
+        end
+
+        player:speedUp(dt)
+        if transitionTimer > 2 then
+            player:reset()
             --print(transitionTimer)
             gameState = "fight"
             transitionTimer = 0
@@ -96,7 +125,9 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.draw(background)
+    love.graphics.draw(background, 0, backgroundY)
+    --love.graphics.draw(background, 0, backgroundY + background:getHeight())
+    --love.graphics.draw(background, 0, -2200)
     player:render()
     if gameState == "fight" or gameState == "dead" then
         for key, enemy in pairs(enemies) do
@@ -125,6 +156,10 @@ function love.draw()
         love.graphics.printf('Congratulations', 0, 400, WINDOW_WIDTH, 'center')
         love.graphics.setFont(pressKeyFont)
         love.graphics.printf('Press Enter to restart', 0, 450, WINDOW_WIDTH, 'center')
+    end
+    if gameState == "transition" then
+        love.graphics.setFont(titlefont)
+        love.graphics.printf('Level ' .. currentLevel, 0, 400, WINDOW_WIDTH, 'center')
     end
 end
 
@@ -166,6 +201,7 @@ function love.keypressed(key)
             currentLevel = 1
             _G.allEnemyBombs = {}
             LoadLevel(currentLevel)
+            finish = false
             gameState = "fight"
         end
     end
@@ -176,6 +212,7 @@ function love.keypressed(key)
             currentLevel = 1
             _G.allEnemyBombs = {}
             LoadLevel(currentLevel)
+            finish = false
             gameState = "fight"
         end
     end
@@ -201,4 +238,10 @@ function WinConditionMet()
     else
         return false
     end
+end
+
+function finishSound()
+    sounds['finish']:setVolume(0.5)
+    sounds['finish']:play()
+    finish = true
 end
