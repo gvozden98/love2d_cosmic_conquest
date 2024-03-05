@@ -91,15 +91,15 @@ function Player:render()
 end
 
 function Player:autoShoot(dt)
-    self.timer = self.timer + dt
-    if self.timer >= self.fireRate then
-        self.shooting = true
-        self.shotX = self.x
-        table.insert(self.bombs, Bomb(self.shotX))
-        self.timer = 0
-        sounds['shoot']:setVolume(0.5)
-        sounds['shoot']:play()
-    end
+    -- self.timer = self.timer + dt
+    -- if self.timer >= self.fireRate then
+    --     self.shooting = true
+    --     self.shotX = self.x
+    --     table.insert(self.bombs, Bomb(self.shotX))
+    --     self.timer = 0
+    --     sounds['shoot']:setVolume(0.5)
+    --     sounds['shoot']:play()
+    -- end
 end
 
 function Player:shoot()

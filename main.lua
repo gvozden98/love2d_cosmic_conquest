@@ -18,7 +18,10 @@ require "/src/Explosion"
 require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
 require "/src/Level"
+require "src/Boss"
 local levels = require "/src/Level"
+local currentLevelData = levels[1]
+
 local background = love.graphics.newImage("/assets/sprites/Space Background_long.png")
 local backgroundY = -2200
 local backgroundSpeed = 200
@@ -28,12 +31,13 @@ WINDOW_HEIGHT = 800
 local currentLevel = 1
 local gameState = ""
 local transitionTimer = 0
+local bossTimer = 0
 local player = Player()
 local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
-local removedEnemyBombs = {}
 local finish = false
+--local bossDead = Boss()
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
@@ -63,7 +67,7 @@ function love.update(dt)
             finishSound()
         end
     end
-    print(#enemies .. " " .. currentLevel)
+    --print(#enemies .. " " .. currentLevel)
     player:update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
@@ -72,14 +76,17 @@ function love.update(dt)
         for key, enemy in pairs(enemies) do
             enemy:collides(player)
             enemy:shoot(dt)
+            enemy:update(dt)
             if enemy.collided == true then
+
                 table.remove(enemies, key)
-                table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
-            end
-            if enemy.collided and enemy.shooting then
-                for key, removedEnemyBomb in pairs(removedEnemyBombs) do
-                    print("bomb added " .. " " .. removedEnemyBomb.bombx .. " " .. key)
+                if currentLevelData.isBoss then
+                    table.insert(explosions,Boss(enemy.x,enemy.y,"",true))
                 end
+                if not currentLevelData.isBoss then
+                    table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
+                end
+                
             end
         end
         --explode the ships if they have been hit
@@ -120,8 +127,8 @@ function love.update(dt)
     if player.collided then
         gameState = "dead"
     end
-    print(gameState)
-    --print(#levels)
+    --print(gameState)
+    
 end
 
 function love.draw()
@@ -138,7 +145,6 @@ function love.draw()
         explosion:render()
     end
     AllEnemyBombs:render()
-
     if gameState == "start" then
         love.graphics.setFont(titlefont)
         love.graphics.printf('Cosmic Conquest', 0, 400, WINDOW_WIDTH, 'center')
@@ -222,8 +228,13 @@ function LoadLevel(level)
     -- Load level data (enemy types, positions, etc.)
     -- Set up initial game state for the given level
 
-    local currentLevelData = levels[level]
-    currentLevelData:populate()
+    currentLevelData = levels[level]
+    if not currentLevelData.isBoss then
+        currentLevelData:populate()
+    else
+        currentLevelData:populateBoss()
+    end
+    
     enemies = currentLevelData.generatedEnemies
 
     --print(#currentLevelData.generatedEnemies)
