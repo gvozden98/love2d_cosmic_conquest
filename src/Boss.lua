@@ -16,8 +16,8 @@ function Boss:init(x, y, sprite,collided)
     self.dy = 100
     --shooting variables
     self.timer = 0
-    self.minInterval = 2
-    self.maxInterval = 6
+    self.minInterval = 0.5
+    self.maxInterval = 1
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 
     --destruction

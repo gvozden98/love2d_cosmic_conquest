@@ -208,6 +208,7 @@ function love.keypressed(key)
             _G.allEnemyBombs = {}
             LoadLevel(currentLevel)
             finish = false
+            backgroundY = -2200
             gameState = "fight"
         end
     end

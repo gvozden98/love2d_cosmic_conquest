@@ -27,9 +27,13 @@ function Level:populateBoss()
 end
 
 return {
-    Level(Enemies(1,true,"assets/sprites/boss/boss.png"), 128, 1,true),
     Level(Enemies(1,false,"assets/sprites/enemy_spaceships_sheet.png"), 32, 1,false),
+    Level(Enemies(2,false,"assets/sprites/enemy_spaceships_sheet.png"), 32, 2,false),
+    Level(Enemies(4,false,"assets/sprites/enemy_spaceships_sheet.png"), 32, 3,false),
+    Level(Enemies(1,true,"assets/sprites/boss/boss.png"), 128, 1,true),
     Level(Enemies(3,false,"assets/sprites/enemy_spaceships_sheet.png"), 32, 1,false),
+    
+
     -- Level(Enemies(4), 32, 3,false),
     -- Level(Enemies(5), 32, 4,false),
 
