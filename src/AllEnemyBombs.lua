@@ -35,8 +35,10 @@ function AllEnemyBombs:collidesWithPlayer(player)
             --if collided then remove the bomb
             player.collided = true
             enemyBomb.remove = true
+            
             sounds['player_dead']:setVolume(0.5)
             sounds['player_dead']:play()
         end
     end
 end
+

@@ -4,7 +4,7 @@ function Bomb:init(playerx, playery)
     -- bomb probably needs to have a seperate class
     self.bomb = love.graphics.newImage("assets/sprites/bomb.png")
     self.bombx = playerx + self.bomb:getWidth() / 2 + 7
-    self.bomby = WINDOW_HEIGHT - 124
+    self.bomby = WINDOW_HEIGHT - 124 --why not playery?
     self.bombdy = 500
     self.remove = false
 end

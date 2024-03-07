@@ -68,5 +68,3 @@ function Enemy:shoot(dt)
         sounds['enemy_shoot']:play()
     end
 end
-
-

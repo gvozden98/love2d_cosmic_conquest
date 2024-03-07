@@ -18,7 +18,7 @@ require "/src/Explosion"
 require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
 require "/src/Level"
-require "src/Boss"
+require "/src/Boss"
 local levels = require "/src/Level"
 local currentLevelData = levels[1]
 
@@ -55,7 +55,8 @@ function love.load()
         ['finish'] = love.audio.newSource('sounds/finish.wav', 'static'),
         ['player_dead'] = love.audio.newSource('sounds/playerdead.wav', 'static'),
         ['shoot'] = love.audio.newSource('sounds/shoot.wav', 'static'),
-        ['transition'] = love.audio.newSource('sounds/transition.wav', 'static')
+        ['transition'] = love.audio.newSource('sounds/transition.wav', 'static'),
+        ['laser'] = love.audio.newSource('sounds/laser1.wav', 'static')
     }
 end
 
@@ -71,13 +72,16 @@ function love.update(dt)
     player:update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
-    if gameState == "fight" then
+    if gameState == "fight" or gameState == "dead" then
         player:autoShoot(dt)
         for key, enemy in pairs(enemies) do
             enemy:collides(player)
             enemy:shoot(dt)
             enemy:update(dt)
 
+            if currentLevelData.isBoss then
+                enemy:collidesWithPlayer(player)
+            end
             if enemy.collided == true then
                 if currentLevelData.isBoss then
                     if enemy.dead then
@@ -136,7 +140,11 @@ function love.draw()
     love.graphics.draw(background, 0, backgroundY)
     --love.graphics.draw(background, 0, backgroundY + background:getHeight())
     --love.graphics.draw(background, 0, -2200)
+
     player:render()
+
+
+
     if gameState == "fight" or gameState == "dead" then
         for key, enemy in pairs(enemies) do
             enemy:render()
@@ -221,6 +229,7 @@ function love.keypressed(key)
             _G.allEnemyBombs = {}
             LoadLevel(currentLevel)
             finish = false
+            backgroundY = -2200
             gameState = "fight"
         end
     end

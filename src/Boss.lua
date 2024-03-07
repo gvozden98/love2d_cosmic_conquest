@@ -13,18 +13,12 @@ function Boss:init(x, y, sprite, dead)
     self.shotX = 0
     self.bombs = {}
     self.shooting = false
-    self.shootingRay = false
     self.dx = 150
     self.dy = 100
     self.life = 10
     self.dead = dead
-    self.explosions = {} --Idk why i have to assign something here
+    self.explosions = {}
 
-    --bomb variables
-    self.timer = 0
-    self.minInterval = 0.5
-    self.maxInterval = 1
-    self.interval = love.math.random(self.minInterval, self.maxInterval)
 
 
 
@@ -39,22 +33,33 @@ function Boss:init(x, y, sprite, dead)
     self.engineAnimation = anim8.newAnimation(self.gridEngine('1-8', 1), 0.08)
 
     --------Weapons---------------
-    -- self.ray = love.graphics.newImage("assets/sprites/boss/boss_ray.png")
-    -- self.gridRay = anim8.newGrid(36, 36, self.ray:getWidth(), self.ray:getHeight())
-    -- self.rayAnimation = anim8.newAnimation(self.gridRay('1-2', 1), 0.08, 'pauseAtEnd')
+
+
+    --------Bomb variables
+    self.timer = 0
+    self.minInterval = 0.3
+    self.maxInterval = 0.5
+    self.interval = 0.3
 
     --------Laser
-    self.laserAnimationTimer = 0.15
+    self.laserOffsetX = 33
+    self.laserOffsetY = 64
+    self.laserX = self.x + self.laserOffsetX
+    self.laserY = self.y + self.laserOffsetY
+    self.laserHeight = 712
+    self.laserWidth = 61
+    self.laserAnimationTimer = 0.5 --perfect time for laser animation
     self.laserTimer = 0
     self.minLaserInterval = 4
     self.maxLaserInterval = 8
     self.shootingLaser = false
     self.laserInterval = 5
-    self.laser = love.graphics.newImage("assets/sprites/boss/MegaLaserSheet.png")
-    self.gridLaser = anim8.newGrid(61, 178, self.laser:getWidth(), self.laser:getHeight())
+    self.laser = love.graphics.newImage("assets/sprites/boss/MegaLaserSheetLong.png")
+    self.gridLaser = anim8.newGrid(self.laserWidth, self.laserHeight, self.laser:getWidth(), self.laser:getHeight())
     self.frames = self.gridLaser(1, '1-4', 1, '4-1')
     --{ ['1-3'] = 0.05, ['4-5'] = 0.2, ['6-8'] = 0.05 } frames 1-3 and 6-8 will go on for 0.05s while 4 and 5 will go on for 0.2s
-    self.laserAnimation = anim8.newAnimation(self.frames, { ['1-3'] = 0.03, ['4-5'] = 0.2, ['6-8'] = 0.03 })
+    self.laserAnimation = anim8.newAnimation(self.frames,
+        { ['1-3'] = 0.20, ['4-5'] = self.laserAnimationTimer, ['6-8'] = 0.10 })
 
     --moving
     self.movingTimer = 0
@@ -66,18 +71,16 @@ function Boss:init(x, y, sprite, dead)
 end
 
 function Boss:update(dt)
+    self:laserPosition()
     self.destructionAnimation:update(dt)
     self.engineAnimation:update(dt)
-    --self.rayAnimation:update(dt)
     self.laserAnimation:update(dt)
     for k, explosion in pairs(self.explosions) do
         explosion:update(dt)
     end
-
     self.x = self.x + self.dx * dt * self.leftOrRight
     self.y = self.y + self.dy * dt * self.downOrUp
     self:move(dt)
-    --self:shootRay(dt)
     self:shootLaser(dt)
 end
 
@@ -90,7 +93,7 @@ function Boss:render()
         self.engineAnimation:draw(self.engine, self.x, self.y)
         if self.shootingLaser then
             --self.rayAnimation:draw(self.ray, self.x, self.y)
-            self.laserAnimation:draw(self.laser, self.x + 32, self.y + 64)
+            self.laserAnimation:draw(self.laser, self.x + self.laserOffsetX, self.y + self.laserOffsetY)
         end
 
         love.graphics.draw(self.enemySpritesheet, self.x, self.y)
@@ -123,6 +126,18 @@ function Boss:collides(player)
     end
 end
 
+function Boss:collidesWithPlayer(player)
+    if player.x < self.laserX + self.laserWidth and
+        self.laserX < player.x + player.width and
+        player.y < self.laserY + self.laserHeight and
+        self.laserY < player.y + player.height and self.shootingLaser
+    then
+        player.collided = true
+        sounds['player_dead']:setVolume(0.5)
+        sounds['player_dead']:play()
+    end
+end
+
 function Boss:shoot(dt)
     self.timer = self.timer + dt
     if self.timer >= self.interval then
@@ -133,18 +148,9 @@ function Boss:shoot(dt)
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)
         sounds['enemy_shoot']:play()
+        self.interval = love.math.random(self.minInterval, self.maxInterval)
     end
 end
-
--- function Boss:shootRay(dt)
---     self.timer = self.timer + dt
---     self.shootingRay = false;
---     if self.timer >= self.interval then
---         self.shootingRay = true
---         self.timer = 0
---         --table.insert(allEnemyBombs, EnemyBomb(self.x, self.y))
---     end
--- end
 
 function Boss:shootLaser(dt)
     self.laserTimer = self.laserTimer + dt
@@ -152,16 +158,17 @@ function Boss:shootLaser(dt)
     --self.laserAnimation:pause()
     --print(self.laserTimer .. " " .. self.laserInterval)
     if self.shootingLaser and self.laserTimer > self.laserAnimationTimer + 0.15 then
-        self.laserAnimation:pause()
+        --self.laserAnimation:pause()
         self.shootingLaser = false
     end
     if self.laserTimer >= self.laserInterval then
         self.laserInterval = love.math.random(self.minLaserInterval, self.maxLaserInterval)
         --self.laserAnimation:resume()
-        self.laserAnimation:resume()
         self.shootingLaser = true
         self.laserTimer = 0
-        --table.insert(allEnemyBombs, EnemyBomb(self.x, self.y))
+        sounds['laser']:stop()
+        sounds['laser']:setVolume(0.8)
+        sounds['laser']:play()
     end
 end
 
@@ -204,4 +211,9 @@ end
 
 function Boss:randomSpeed()
     return math.random(50, 150)
+end
+
+function Boss:laserPosition()
+    self.laserX = self.x + self.laserOffsetX
+    self.laserY = self.y + self.laserOffsetY
 end
