@@ -77,16 +77,18 @@ function love.update(dt)
             enemy:collides(player)
             enemy:shoot(dt)
             enemy:update(dt)
-            if enemy.collided == true then
 
-                table.remove(enemies, key)
+            if enemy.collided == true then
                 if currentLevelData.isBoss then
-                    table.insert(explosions,Boss(enemy.x,enemy.y,"",true))
+                    if enemy.dead then
+                        table.remove(enemies, key)
+                        table.insert(explosions, Boss(enemy.x, enemy.y, "", true))
+                    end
                 end
                 if not currentLevelData.isBoss then
-                    table.insert(explosions, Explosion(enemy.x, enemy.y, 2))
+                    table.remove(enemies, key)
+                    table.insert(explosions, Explosion(enemy.x, enemy.y, 2, 0.08))
                 end
-                
             end
         end
         --explode the ships if they have been hit
@@ -101,7 +103,7 @@ function love.update(dt)
         if backgroundY > background:getHeight() then
             backgroundY = 0
         end
-        --speed up the bombs 
+        --speed up the bombs
         for key, bomb in pairs(allEnemyBombs) do
             bomb.bombdy = 1000
         end
@@ -128,7 +130,6 @@ function love.update(dt)
         gameState = "dead"
     end
     --print(gameState)
-    
 end
 
 function love.draw()
@@ -235,7 +236,7 @@ function LoadLevel(level)
     else
         currentLevelData:populateBoss()
     end
-    
+
     enemies = currentLevelData.generatedEnemies
 
     --print(#currentLevelData.generatedEnemies)

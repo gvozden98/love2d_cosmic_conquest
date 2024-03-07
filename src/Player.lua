@@ -23,7 +23,7 @@ function Player:init()
 
     self.shotX = 0
     self.bombs = {}
-    self.explosion = Explosion(self.x, self.y, 2)
+    self.explosion = Explosion(self.x, self.y, 2, 0.08)
     self.shooting = false
     self.collided = false
     --auto shooting

@@ -1,39 +1,60 @@
 require '/src/EnemyBomb'
-Boss = class {}
+require '/src/Explosion'
+Boss = class()
 
-function Boss:init(x, y, sprite,collided)
+
+function Boss:init(x, y, sprite, dead)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/boss/boss.png")
     self.width = 128
     self.height = 128
     self.x = x
     self.y = y
-    self.collided = collided
+    self.collided = true
     self.shotX = 0
     self.bombs = {}
     self.shooting = false
     self.shootingRay = false
     self.dx = 150
     self.dy = 100
-    --shooting variables
+    self.life = 10
+    self.dead = dead
+    self.explosions = {} --Idk why i have to assign something here
+
+    --bomb variables
     self.timer = 0
     self.minInterval = 0.5
     self.maxInterval = 1
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 
+
+
     --destruction
     self.destruction = love.graphics.newImage("assets/sprites/boss/boss_dead.png")
-    self.gridDestruction = anim8.newGrid(128,128, self.destruction:getWidth(), self.destruction:getHeight())
-    self.destructionAnimation = anim8.newAnimation(self.gridDestruction('1-13', 1), 0.08,"pauseAtEnd")
+    self.gridDestruction = anim8.newGrid(128, 128, self.destruction:getWidth(), self.destruction:getHeight())
+    self.destructionAnimation = anim8.newAnimation(self.gridDestruction('1-13', 1), 0.08, "pauseAtEnd")
 
     --engine
     self.engine = love.graphics.newImage("assets/sprites/boss/boss_engine.png")
-    self.gridEngine = anim8.newGrid(128,128, self.engine:getWidth(), self.engine:getHeight())
+    self.gridEngine = anim8.newGrid(128, 128, self.engine:getWidth(), self.engine:getHeight())
     self.engineAnimation = anim8.newAnimation(self.gridEngine('1-8', 1), 0.08)
 
-    --weapons
-    self.ray = love.graphics.newImage("assets/sprites/boss/boss_ray.png")
-    self.gridRay = anim8.newGrid(36,36, self.ray:getWidth(), self.ray:getHeight())
-    self.rayAnimation = anim8.newAnimation(self.gridRay('1-2', 1), 0.08,'pauseAtEnd')
+    --------Weapons---------------
+    -- self.ray = love.graphics.newImage("assets/sprites/boss/boss_ray.png")
+    -- self.gridRay = anim8.newGrid(36, 36, self.ray:getWidth(), self.ray:getHeight())
+    -- self.rayAnimation = anim8.newAnimation(self.gridRay('1-2', 1), 0.08, 'pauseAtEnd')
+
+    --------Laser
+    self.laserAnimationTimer = 0.15
+    self.laserTimer = 0
+    self.minLaserInterval = 4
+    self.maxLaserInterval = 8
+    self.shootingLaser = false
+    self.laserInterval = 5
+    self.laser = love.graphics.newImage("assets/sprites/boss/MegaLaserSheet.png")
+    self.gridLaser = anim8.newGrid(61, 178, self.laser:getWidth(), self.laser:getHeight())
+    self.frames = self.gridLaser(1, '1-4', 1, '4-1')
+    --{ ['1-3'] = 0.05, ['4-5'] = 0.2, ['6-8'] = 0.05 } frames 1-3 and 6-8 will go on for 0.05s while 4 and 5 will go on for 0.2s
+    self.laserAnimation = anim8.newAnimation(self.frames, { ['1-3'] = 0.03, ['4-5'] = 0.2, ['6-8'] = 0.03 })
 
     --moving
     self.movingTimer = 0
@@ -47,39 +68,57 @@ end
 function Boss:update(dt)
     self.destructionAnimation:update(dt)
     self.engineAnimation:update(dt)
-    self.rayAnimation:update(dt)
-    self.x=self.x+self.dx*dt*self.leftOrRight
-    self.y=self.y+self.dy*dt*self.downOrUp
+    --self.rayAnimation:update(dt)
+    self.laserAnimation:update(dt)
+    for k, explosion in pairs(self.explosions) do
+        explosion:update(dt)
+    end
+
+    self.x = self.x + self.dx * dt * self.leftOrRight
+    self.y = self.y + self.dy * dt * self.downOrUp
     self:move(dt)
-    self:shootRay(dt)
+    --self:shootRay(dt)
+    self:shootLaser(dt)
 end
 
 function Boss:render()
-    if self.collided then
+    if self.dead then
         self.destructionAnimation:draw(self.destruction, self.x, self.y)
     end
-    
-    if not self.collided then
+
+    if not self.dead then
+        self.engineAnimation:draw(self.engine, self.x, self.y)
+        if self.shootingLaser then
+            --self.rayAnimation:draw(self.ray, self.x, self.y)
+            self.laserAnimation:draw(self.laser, self.x + 32, self.y + 64)
+        end
+
         love.graphics.draw(self.enemySpritesheet, self.x, self.y)
-        self.engineAnimation:draw(self.engine,self.x,self.y)
-        if self.shootingRay then
-        self.rayAnimation:draw(self.ray,self.x,self.y)
+        for k, explosion in pairs(self.explosions) do
+            explosion:render()
         end
     end
 end
 
+--the sprite is not the width of the boss but a little wider so i had to adjust,done crudely, can be done a lot better
 function Boss:collides(player)
     for index, bomb in ipairs(player.bombs) do
-        if self.x < bomb.bombx + 3 and
-            bomb.bombx < self.x + self.width and
-            self.y < bomb.bomby + 3 and
-            bomb.bomby < self.y + self.height
+        if self.x + 28 < bomb.bombx + 3 and
+            bomb.bombx < self.x + 28 + self.width - 48 and
+            self.y - 20 < bomb.bomby + 3 and
+            bomb.bomby < self.y - 20 + self.height - 20
         then
             sounds['boom']:stop()
             sounds['boom']:setVolume(0.4)
             sounds['boom']:play()
             self.collided = true
             bomb.remove = true
+            self.life = self.life - 1
+            table.insert(self.explosions, Explosion(bomb.bombx, bomb.bomby, 10, 0.03))
+            print(self.life)
+            if self.life <= 0 then
+                self.dead = true
+            end
         end
     end
 end
@@ -88,8 +127,8 @@ function Boss:shoot(dt)
     self.timer = self.timer + dt
     if self.timer >= self.interval then
         self.shooting = true
-        self.shotX = self.x+64
-        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y+128))
+        self.shotX = self.x + 64
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y + 128))
         self.timer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)
@@ -97,55 +136,72 @@ function Boss:shoot(dt)
     end
 end
 
-function Boss:shootRay(dt)
-    self.timer = self.timer + dt
-    self.shootingRay=false;
-    if self.timer >= self.interval then
-        self.shootingRay = true
-        self.timer = 0
+-- function Boss:shootRay(dt)
+--     self.timer = self.timer + dt
+--     self.shootingRay = false;
+--     if self.timer >= self.interval then
+--         self.shootingRay = true
+--         self.timer = 0
+--         --table.insert(allEnemyBombs, EnemyBomb(self.x, self.y))
+--     end
+-- end
+
+function Boss:shootLaser(dt)
+    self.laserTimer = self.laserTimer + dt
+    --self.shootingLaser = false;
+    --self.laserAnimation:pause()
+    --print(self.laserTimer .. " " .. self.laserInterval)
+    if self.shootingLaser and self.laserTimer > self.laserAnimationTimer + 0.15 then
+        self.laserAnimation:pause()
+        self.shootingLaser = false
+    end
+    if self.laserTimer >= self.laserInterval then
+        self.laserInterval = love.math.random(self.minLaserInterval, self.maxLaserInterval)
+        --self.laserAnimation:resume()
+        self.laserAnimation:resume()
+        self.shootingLaser = true
+        self.laserTimer = 0
         --table.insert(allEnemyBombs, EnemyBomb(self.x, self.y))
     end
 end
 
 function Boss:move(dt)
     self.movingTimer = self.movingTimer + dt
-    if self.x<=16 then
+    if self.x <= 16 then
         self.leftOrRight = 1
-        self.movingTimer=0
+        self.movingTimer = 0
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
-    if self.x>=500 then
+    if self.x >= 500 then
         self.leftOrRight = -1
-        self.movingTimer=0
+        self.movingTimer = 0
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
-    if self.y<=16 then
+    if self.y <= 16 then
         self.downOrUp = 1
-        self.movingTimer=0
+        self.movingTimer = 0
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
-    if self.y>=500 then
+    if self.y >= 500 then
         self.downOrUp = -1
-        self.movingTimer=0
+        self.movingTimer = 0
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
     --print(self.movingTimer .. " " .. self.movingInterval)
     --print(self.x)
     if self.movingTimer >= self.movingInterval then
-        self.leftOrRight = math.random(-1,1)
-        self.downOrUp = math.random(-1,1)
+        self.leftOrRight = math.random(-1, 1)
+        self.downOrUp = math.random(-1, 1)
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
-        self.movingTimer=0;
+        self.movingTimer = 0;
     end
-
- 
 end
 
 function Boss:randomSpeed()
-    return math.random(50,150)
+    return math.random(50, 150)
 end

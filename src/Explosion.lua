@@ -1,9 +1,9 @@
 Explosion = class {}
 
-function Explosion:init(x, y, animationNumber,numberOfSprites)
+function Explosion:init(x, y, animationNumber, speed)
     self.explosion = love.graphics.newImage("assets/sprites/Explotion2.png")
     self.grid = anim8.newGrid(32, 32, self.explosion:getWidth(), self.explosion:getHeight())
-    self.firstAnimation = anim8.newAnimation(self.grid('1-8', animationNumber), 0.08, 'pauseAtEnd')
+    self.firstAnimation = anim8.newAnimation(self.grid('1-8', animationNumber), speed, 'pauseAtEnd')
     self.x = x
     self.y = y
     self.finished = false
