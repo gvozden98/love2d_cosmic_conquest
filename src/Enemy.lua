@@ -56,6 +56,7 @@ function Enemy:collides(player)
             sounds['boom']:setVolume(0.4)
             sounds['boom']:play()
             self.collided = true
+            self.dead = true
             bomb.remove = true
         end
     end
@@ -78,7 +79,7 @@ function Enemy:move(dt)
     self.x = self.x + self.dx * dt
     self.y = self.y + self.dy * dt
     self.moveTimer = self.moveTimer + dt
-    print(self.moveTimer)
+    --print(self.moveTimer)
     if self.moveTimer > 5 then
         self.dx = self.dx * self:random()
         self.dy = self.dy * self:random()

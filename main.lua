@@ -19,6 +19,7 @@ require "/src/EnemyBomb"
 require "/src/AllEnemyBombs"
 require "/src/Level"
 require "/src/Boss"
+require "/src/PowerUp"
 local levels = require "/src/Level"
 local currentLevelData = levels[1]
 
@@ -31,15 +32,16 @@ WINDOW_HEIGHT = 800
 local currentLevel = 1
 local gameState = ""
 local transitionTimer = 0
-local bossTimer = 0
 local player = Player()
 local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
 local finish = false
-_G.enemyMovement = false
+local powerUps = {}
+local increasedLife = false
 
 function love.load()
+    AllEnemyBombs:init()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
     love.keyboard.keysPressed = {}
@@ -84,6 +86,13 @@ function love.update(dt)
                 enemy:collidesWithPlayer(player)
             end
             if enemy.collided == true then
+                if math.random(1, 100) < 60 then
+                    if math.random(-1, 1) < 0 then
+                        table.insert(powerUps, PowerUp(enemy.x, enemy.y, true))
+                    else
+                        table.insert(powerUps, PowerUp(enemy.x, enemy.y, false))
+                    end
+                end
                 if currentLevelData.isBoss then
                     if enemy.dead then
                         table.remove(enemies, key)
@@ -96,7 +105,6 @@ function love.update(dt)
                 end
             end
         end
-        --explode the ships if they have been hit
     end
 
     if gameState == "transition" then
@@ -131,7 +139,15 @@ function love.update(dt)
     for key, explosion in pairs(explosions) do
         explosion:update(dt)
     end
-    if player.collided then
+    for key, powerUp in pairs(powerUps) do
+        powerUp:update(dt)
+        powerUp:collidesWithPlayer(player)
+
+        if powerUp.collided == true then
+            table.remove(powerUps, key)
+        end
+    end
+    if player.dead then
         gameState = "dead"
     end
     --print(gameState)
@@ -153,6 +169,9 @@ function love.draw()
     end
     for key, explosion in pairs(explosions) do
         explosion:render()
+    end
+    for key, powerUp in pairs(powerUps) do
+        powerUp:render()
     end
     AllEnemyBombs:render()
     if gameState == "start" then
@@ -199,7 +218,7 @@ function love.keypressed(key)
     --Shooting on click
 
     --if not player.shooting then
-    if key == 'space' and not player.collided and gameState == "fight" then
+    if key == 'space' and not player.dead and gameState == "fight" then
         player:shoot()
     end
     --end

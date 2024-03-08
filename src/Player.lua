@@ -20,12 +20,14 @@ function Player:init()
     self.y = WINDOW_HEIGHT - 100
     self.dx = 300
     self.dy = 450
+    self.life = 3
 
     self.shotX = 0
     self.bombs = {}
     self.explosion = Explosion(self.x, self.y, 2, 0.08)
     self.shooting = false
     self.collided = false
+    self.dead = false
     --auto shooting
     self.fireRate = 1.5
     self.timer = 0
@@ -35,18 +37,20 @@ function Player:update(dt)
     self.firstAnimation:update(dt)
     self.explosion.x = self.x
     self.explosion.y = self.y
-    if not self.collided then
+    if self.life == 0 then
+        self.dead = true
+    end
+    if not self.dead then
         if love.keyboard.isDown('left') then
-            if self.x <= self.width / 2 then
-                self.x = self.width / 2
+            if self.x <= self.width - 43 then
+                self.x = self.width - 43
             else
                 self.x = self.x - self.dx * dt
             end
         end
         if love.keyboard.isDown('right') then
-            -- Dont know why i had to subtract another 1/2 of the width
-            if self.x >= WINDOW_WIDTH - self.width - self.width / 2 then
-                self.x = WINDOW_WIDTH - self.width - self.width / 2
+            if self.x >= WINDOW_WIDTH - self.width - self.width + 43 then
+                self.x = WINDOW_WIDTH - self.width - self.width + 43
             else
                 self.x = self.x + self.dx * dt
             end
@@ -74,7 +78,7 @@ end
 
 function Player:render()
     -- can not get width of quad for some reason
-    if not self.collided then
+    if not self.dead then
         self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
     else
@@ -83,7 +87,7 @@ function Player:render()
 
     if self.shooting == true then
         for index, bomb in ipairs(self.bombs) do
-            if not self.collided then
+            if not self.dead then
                 bomb:render()
             end
         end
@@ -91,15 +95,16 @@ function Player:render()
 end
 
 function Player:autoShoot(dt)
-    -- self.timer = self.timer + dt
-    -- if self.timer >= self.fireRate then
-    --     self.shooting = true
-    --     self.shotX = self.x
-    --     table.insert(self.bombs, Bomb(self.shotX))
-    --     self.timer = 0
-    --     sounds['shoot']:setVolume(0.5)
-    --     sounds['shoot']:play()
-    -- end
+    self.timer = self.timer + dt * 2
+    if self.timer >= self.fireRate then
+        print(self.fireRate)
+        self.shooting = true
+        self.shotX = self.x
+        table.insert(self.bombs, Bomb(self.shotX))
+        self.timer = 0
+        sounds['shoot']:setVolume(0.5)
+        sounds['shoot']:play()
+    end
 end
 
 function Player:shoot()
@@ -118,4 +123,20 @@ end
 function Player:reset()
     self.x = WINDOW_WIDTH / 2 - self.width / 2
     self.y = WINDOW_HEIGHT - 100
+end
+
+function Player:increaseLife()
+    self.life = self.life + 1
+    print("life " .. self.life)
+end
+
+function Player:decreaseLife()
+    self.life = self.life - 1
+    print("life " .. self.life)
+end
+
+function Player:increaseShootingSpeed()
+    if self.fireRate >= 0.5 then
+        self.fireRate = self.fireRate - self.fireRate / 5
+    end
 end
