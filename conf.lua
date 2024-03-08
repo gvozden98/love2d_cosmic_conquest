@@ -1,6 +1,6 @@
 function love.conf(t)
     t.window.title = "Cosmic Conquest" -- Set the window title
-    t.window.width = 600               -- Set the window width
+    t.window.width = 1200              -- Set the window width
     t.window.height = 800              -- Set the window height
     t.window.resizable = false         -- Allow the window to be resized
     t.window.fullscreen = false        -- Start the game in windowed mode

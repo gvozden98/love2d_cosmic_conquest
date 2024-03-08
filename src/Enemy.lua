@@ -8,6 +8,8 @@ function Enemy:init(quad, x, y)
     self.height = 32
     self.x = x
     self.y = y
+    self.dx = 100
+    self.dy = 100
     self.collided = false
     self.shotX = 0
     self.bombs = {}
@@ -18,10 +20,13 @@ function Enemy:init(quad, x, y)
     self.minInterval = 2
     self.maxInterval = 6
     self.interval = love.math.random(self.minInterval, self.maxInterval)
+
+    --movement
+    self.moveTimer = 5
 end
 
 function Enemy:update(dt)
-
+    self:move(dt)
 end
 
 function Enemy:render()
@@ -66,5 +71,40 @@ function Enemy:shoot(dt)
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)
         sounds['enemy_shoot']:play()
+    end
+end
+
+function Enemy:move(dt)
+    self.x = self.x + self.dx * dt
+    self.y = self.y + self.dy * dt
+    self.moveTimer = self.moveTimer + dt
+    print(self.moveTimer)
+    if self.moveTimer > 5 then
+        self.dx = self.dx * self:random()
+        self.dy = self.dy * self:random()
+        self.moveTimer = 0
+    end
+    if self.x >= 600 - self.width - 5 then
+        self.dx = self.dx * -1
+    end
+    if self.x <= 5 then
+        self.dx = self.dx * -1
+    end
+    if self.y >= 500 then
+        self.dy = self.dy * -1
+    end
+    if self.y <= self.width then
+        self.dy = self.dy * -1
+    end
+end
+
+function Enemy:random()
+    local x = math.random(-100, 100)
+    if x == 0 then
+        return 1
+    elseif x < 0 then
+        return -1
+    elseif x > 0 then
+        return 1
     end
 end

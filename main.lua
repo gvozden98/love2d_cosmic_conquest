@@ -37,7 +37,7 @@ local enemies = {}
 _G.allEnemyBombs = {}
 local explosions = {}
 local finish = false
---local bossDead = Boss()
+_G.enemyMovement = false
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", 'nearest')
@@ -62,6 +62,7 @@ end
 
 function love.update(dt)
     --check collision with the enemies
+    --print(dt)
     if currentLevel > #levels - 1 then
         gameState = "finish"
         if finish == false then
