@@ -23,9 +23,9 @@ require "/src/PowerUp"
 local levels = require "/src/Level"
 local currentLevelData = levels[1]
 
-local background = love.graphics.newImage("/assets/sprites/Space Background_long.png")
+local background = love.graphics.newImage("/assets/sprites/Space_Background_long2.png")
 local backgroundY = -2200
-local backgroundSpeed = 200
+local backgroundSpeed = 400
 
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 800
@@ -38,7 +38,6 @@ _G.allEnemyBombs = {}
 local explosions = {}
 local finish = false
 local powerUps = {}
-local increasedLife = false
 
 function love.load()
     AllEnemyBombs:init()
@@ -86,13 +85,6 @@ function love.update(dt)
                 enemy:collidesWithPlayer(player)
             end
             if enemy.collided == true then
-                if math.random(1, 100) < 60 then
-                    if math.random(-1, 1) < 0 then
-                        table.insert(powerUps, PowerUp(enemy.x, enemy.y, true))
-                    else
-                        table.insert(powerUps, PowerUp(enemy.x, enemy.y, false))
-                    end
-                end
                 if currentLevelData.isBoss then
                     if enemy.dead then
                         table.remove(enemies, key)
@@ -100,6 +92,13 @@ function love.update(dt)
                     end
                 end
                 if not currentLevelData.isBoss then
+                    if math.random(1, 100) < 20 then
+                        if math.random(-1, 1) < 0 then
+                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, true))
+                        else
+                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, false))
+                        end
+                    end
                     table.remove(enemies, key)
                     table.insert(explosions, Explosion(enemy.x, enemy.y, 2, 0.08))
                 end
@@ -121,7 +120,7 @@ function love.update(dt)
             bomb.bombdy = 1000
         end
 
-        player:speedUp(dt)
+        --player:speedUp(dt)
         if transitionTimer > 2 then
             player:reset()
             --print(transitionTimer)
@@ -151,6 +150,11 @@ function love.update(dt)
         gameState = "dead"
     end
     --print(gameState)
+    if backgroundY > -800 then
+        print("aaaa")
+        backgroundY = -2200
+        background = love.graphics.newImage("/assets/sprites/Space_Background_long2.png")
+    end
 end
 
 function love.draw()

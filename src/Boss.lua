@@ -9,18 +9,15 @@ function Boss:init(x, y, sprite, dead)
     self.height = 128
     self.x = x
     self.y = y
-    self.collided = true
+    self.collided = false
     self.shotX = 0
     self.bombs = {}
     self.shooting = false
     self.dx = 150
     self.dy = 100
-    self.life = 10
+    self.life = 25
     self.dead = dead
     self.explosions = {}
-
-
-
 
     --destruction
     self.destruction = love.graphics.newImage("assets/sprites/boss/boss_dead.png")
@@ -78,10 +75,12 @@ function Boss:update(dt)
     for k, explosion in pairs(self.explosions) do
         explosion:update(dt)
     end
-    self.x = self.x + self.dx * dt * self.leftOrRight
-    self.y = self.y + self.dy * dt * self.downOrUp
-    self:move(dt)
-    self:shootLaser(dt)
+    if not self.dead then
+        self.x = self.x + self.dx * dt * self.leftOrRight
+        self.y = self.y + self.dy * dt * self.downOrUp
+        self:move(dt)
+        self:shootLaser(dt)
+    end
 end
 
 function Boss:render()
@@ -133,8 +132,9 @@ function Boss:collidesWithPlayer(player)
         self.laserY < player.y + player.height and self.shootingLaser
     then
         player.collided = true
-        sounds['player_dead']:setVolume(0.5)
-        sounds['player_dead']:play()
+        -- sounds['player_dead']:setVolume(0.5)
+        -- sounds['player_dead']:play()
+        player:decreaseLife()
     end
 end
 

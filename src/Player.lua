@@ -14,13 +14,20 @@ function Player:init()
     self.player2 = love.graphics.newQuad(48, 0, 48, 48, self.spritesheet:getDimensions())
     self.player3 = love.graphics.newQuad(0, 48, 48, 48, self.spritesheet:getDimensions())
     self.player4 = love.graphics.newQuad(48, 48, 48, 48, self.spritesheet:getDimensions())
+
+    self.lifeSpritsheet = love.graphics.newImage("assets/sprites/health.png")
+    self.health1 = love.graphics.newQuad(0, 0, 96, 32, self.lifeSpritsheet:getDimensions())
+    self.health2 = love.graphics.newQuad(96, 0, 96, 32, self.lifeSpritsheet:getDimensions())
+    self.health3 = love.graphics.newQuad(192, 0, 96, 32, self.lifeSpritsheet:getDimensions())
+    self.health4 = love.graphics.newQuad(288, 0, 96, 32, self.lifeSpritsheet:getDimensions())
+    self.health5 = love.graphics.newQuad(380, 0, 96, 32, self.lifeSpritsheet:getDimensions())
     self.height = 48
     self.width = 48
     self.x = WINDOW_WIDTH / 2 - self.width / 2
     self.y = WINDOW_HEIGHT - 100
     self.dx = 300
     self.dy = 450
-    self.life = 3
+    self.life = 4
 
     self.shotX = 0
     self.bombs = {}
@@ -78,6 +85,7 @@ end
 
 function Player:render()
     -- can not get width of quad for some reason
+    self:getHealth()
     if not self.dead then
         self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
@@ -95,15 +103,17 @@ function Player:render()
 end
 
 function Player:autoShoot(dt)
-    self.timer = self.timer + dt * 2
-    if self.timer >= self.fireRate then
-        print(self.fireRate)
-        self.shooting = true
-        self.shotX = self.x
-        table.insert(self.bombs, Bomb(self.shotX))
-        self.timer = 0
-        sounds['shoot']:setVolume(0.5)
-        sounds['shoot']:play()
+    if not self.dead then
+        self.timer = self.timer + dt * 2
+        if self.timer >= self.fireRate then
+            print(self.fireRate)
+            self.shooting = true
+            self.shotX = self.x
+            table.insert(self.bombs, Bomb(self.shotX))
+            self.timer = 0
+            sounds['shoot']:setVolume(0.5)
+            sounds['shoot']:play()
+        end
     end
 end
 
@@ -126,8 +136,10 @@ function Player:reset()
 end
 
 function Player:increaseLife()
-    self.life = self.life + 1
-    print("life " .. self.life)
+    if self.life < 4 then
+        self.life = self.life + 1
+        print("life " .. self.life)
+    end
 end
 
 function Player:decreaseLife()
@@ -138,5 +150,23 @@ end
 function Player:increaseShootingSpeed()
     if self.fireRate >= 0.5 then
         self.fireRate = self.fireRate - self.fireRate / 5
+    end
+end
+
+function Player:getHealth()
+    if self.life == 4 then
+        return love.graphics.draw(self.lifeSpritsheet, self.health1, 16, WINDOW_HEIGHT - 48)
+    end
+    if self.life == 3 then
+        return love.graphics.draw(self.lifeSpritsheet, self.health2, 16, WINDOW_HEIGHT - 48)
+    end
+    if self.life == 2 then
+        return love.graphics.draw(self.lifeSpritsheet, self.health3, 16, WINDOW_HEIGHT - 48)
+    end
+    if self.life == 1 then
+        return love.graphics.draw(self.lifeSpritsheet, self.health4, 16, WINDOW_HEIGHT - 48)
+    end
+    if self.life == 0 then
+        return love.graphics.draw(self.lifeSpritsheet, self.health5, 16, WINDOW_HEIGHT - 48)
     end
 end
