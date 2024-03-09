@@ -1,9 +1,10 @@
 EnemyBomb = class {}
-
-function EnemyBomb:init(enemyX, enemyY)
-    self.bomb = love.graphics.newImage("assets/sprites/bomb.png")
+--local bomb = "bomb.png"
+function EnemyBomb:init(enemyX, enemyY, bombSprite)
+    self.bomb = love.graphics.newImage(bombSprite)
     self.bombdy = 300
     self.remove = false
+    self.type = type or 1
     --[[    love.math.random() * coneAngle generates a random angle within the cone angle.
     - coneAngle / 2 shifts the range to the left by half of the cone angle, making the cone symmetric around the initial direction.
     + math.pi / 2 adjusts the range to start from 90 degrees (right).]]

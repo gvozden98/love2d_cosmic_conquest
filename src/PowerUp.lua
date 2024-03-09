@@ -40,3 +40,7 @@ function PowerUp:collidesWithPlayer(player)
     end
     return true
 end
+
+function PowerUp:speedUp(dt)
+    self.y = self.y + self.dy * dt
+end

@@ -115,11 +115,13 @@ function love.update(dt)
         if backgroundY > background:getHeight() then
             backgroundY = 0
         end
-        --speed up the bombs
+        --speed up the bombs and powerups
         for key, bomb in pairs(allEnemyBombs) do
             bomb.bombdy = 1000
         end
-
+        for _, powerUp in pairs(powerUps) do
+            powerUp.dy = 1000
+        end
         --player:speedUp(dt)
         if transitionTimer > 2 then
             player:reset()

@@ -1,7 +1,7 @@
 require '/src/EnemyBomb'
 Enemy = class {}
 
-function Enemy:init(quad, x, y)
+function Enemy:init(quad, x, y, bombSprite)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.quad = quad
     self.width = 32
@@ -14,7 +14,7 @@ function Enemy:init(quad, x, y)
     self.shotX = 0
     self.bombs = {}
     self.shooting = false
-
+    self.bombSprite = bombSprite
     --shooting variables
     self.timer = 0
     self.minInterval = 2
@@ -67,7 +67,7 @@ function Enemy:shoot(dt)
     if self.timer >= self.interval then
         self.shooting = true
         self.shotX = self.x
-        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y))
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y, self.bombSprite))
         self.timer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)

@@ -3,7 +3,7 @@ require '/src/Explosion'
 Boss = class()
 
 
-function Boss:init(x, y, sprite, dead)
+function Boss:init(x, y, sprite, dead, bombSprite)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/boss/boss.png")
     self.width = 128
     self.height = 128
@@ -37,6 +37,7 @@ function Boss:init(x, y, sprite, dead)
     self.minInterval = 0.3
     self.maxInterval = 0.5
     self.interval = 0.3
+    self.bombSprite = bombSprite
 
     --------Laser
     self.laserOffsetX = 33
@@ -143,7 +144,7 @@ function Boss:shoot(dt)
     if self.timer >= self.interval then
         self.shooting = true
         self.shotX = self.x + 64
-        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y + 128))
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y + self.width, self.bombSprite))
         self.timer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)

@@ -1,11 +1,12 @@
 require '/src/Enemy'
 Enemies = class {}
-function Enemies:init(type,isBoss,sprite)
+function Enemies:init(type, isBoss, sprite, bombSprite)
     self.enemySpritesheet = love.graphics.newImage(sprite)
     self.enemies = {}
     self.quads = {}
     self.type = type or 1
     self.isBoss = isBoss
+    self.bombSprite = bombSprite
 end
 
 function Enemies:getSprite()
@@ -21,12 +22,12 @@ end
 function Enemies:populate(startX, rows)
     while rows > 0 do
         for i = startX, 600, 64 do
-            table.insert(self.enemies, Enemy(self.quads[self.type], i, rows * 64))
+            table.insert(self.enemies, Enemy(self.quads[self.type], i, rows * 64, self.bombSprite))
         end
         rows = rows - 1
     end
 end
 
 function Enemies:populateBoss()
-    table.insert(self.enemies,Boss(236 ,64,self.enemySpritesheet))
+    table.insert(self.enemies, Boss(236, 64, self.enemySpritesheet, false, "assets/sprites/bomb.png"))
 end
