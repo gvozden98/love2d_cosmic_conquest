@@ -1,10 +1,10 @@
-require "src/Explosion"
+--require "src/Explosion"
 TrackingRocket = class {}
 
 function TrackingRocket:init(x, y)
     self.x = x
     self.y = y
-    self.dx = 250
+    self.dx = 350
     self.dy = 150
     self.deviation = 50
     self.timer = 0
@@ -21,7 +21,7 @@ function TrackingRocket:init(x, y)
     self.vx = 0
     self.verticalComponent = 50 * math.sin(love.timer.getTime())
     self.collided = false
-    self.explosion = Explosion(-30, -30, 10, 0.03)
+    self.explosion = Explosion(-50, -50, 10, 0.03)
 end
 
 function TrackingRocket:update(dt)
@@ -38,7 +38,7 @@ function TrackingRocket:update(dt)
         -- Calculate the new velocity components
         self.vx = self.dx * math.cos(self.angle)
         self.vy = self.dx * math.sin(self.angle) + self.verticalComponent
-        if self:getDistanceFromPlayer() < 50 then
+        if self:getDistanceFromPlayer() < 35 then
             self.rocketCloseEnough = true
             self.x = self.x + self.vx * dt
             self.y = self.y + self.dx * dt
@@ -76,7 +76,7 @@ function TrackingRocket:collidesWithPlayer()
             self.collided = true
             player.collided = true
             if player.life > 1 then
-                self.explosion = Explosion(player.x + 8, player.y + 8, 1, 0.03)
+                self.explosion = Explosion(player.x - 8, player.y - 8, 1, 0.03)
                 sounds['boom']:stop()
                 sounds['boom']:setVolume(0.5)
                 sounds['boom']:play()

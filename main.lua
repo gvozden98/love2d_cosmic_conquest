@@ -77,13 +77,9 @@ function love.update(dt)
     if gameState == "fight" or gameState == "dead" then
         player:autoShoot(dt)
         for key, enemy in pairs(enemies) do
-            enemy:collides(player)
+            enemy:collides()
             enemy:shoot(dt)
             enemy:update(dt)
-
-            if currentLevelData.isBoss then
-                enemy:collidesWithPlayer(player)
-            end
             if enemy.collided == true then
                 if currentLevelData.isBoss then
                     if enemy.dead then

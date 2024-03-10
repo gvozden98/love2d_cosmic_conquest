@@ -62,7 +62,7 @@ function Boss:init(x, y, sprite, dead, bombSprite, player)
         { ['1-3'] = 0.20, ['4-5'] = self.laserAnimationTimer, ['6-8'] = 0.10 })
 
     --------Tracking Bomb
-    self.trackingRocket = TrackingRocket(self.x, self.y)
+    self.trackingRockets = {}
     self.trackingRocketAnimationTimer = 0.5 --perfect time for laser animation
     self.trackingRocketTimer = 0
     self.minTrackingRocketInterval = 1
@@ -102,9 +102,12 @@ function Boss:update(dt)
         self:move(dt)
         self:shootLaser(dt)
         self:shootTrackingRocket(dt)
+        self:laserCollidesWithPlayer()
     end
     --print(self.trackingRocket.dx)
-    self.trackingRocket:update(dt, self.player)
+    for k, rocket in pairs(self.trackingRockets) do
+        rocket:update(dt)
+    end
 end
 
 function Boss:render()
@@ -120,7 +123,9 @@ function Boss:render()
         end
         if self.shootingTrackingRocket then
             --self.trackingRocketAnimation:draw(self.trackingRocket, self.x + 128, self.y + 64)
-            self.trackingRocket:render()
+            for k, rocket in pairs(self.trackingRockets) do
+                rocket:render()
+            end
         end
 
         love.graphics.draw(self.enemySpritesheet, self.x, self.y)
@@ -131,10 +136,10 @@ function Boss:render()
 end
 
 --the sprite is not the width of the boss but a little wider so i had to adjust,done crudely, can be done a lot better
-function Boss:collides(player)
+function Boss:collides()
     for index, bomb in ipairs(player.bombs) do
-        if self.x + 28 < bomb.bombx + 3 and
-            bomb.bombx < self.x + 28 + self.width - 48 and
+        if self.x + 20 < bomb.bombx + 3 and
+            bomb.bombx < self.x + 20 + self.width - 68 and
             self.y - 20 < bomb.bomby + 3 and
             bomb.bomby < self.y - 20 + self.height - 20
         then
@@ -145,7 +150,7 @@ function Boss:collides(player)
             bomb.remove = true
             self.life = self.life - 1
             table.insert(self.explosions, Explosion(bomb.bombx, bomb.bomby, 10, 0.03))
-            print(self.life)
+            print(self.life .. " " .. "player hit the boss")
             if self.life <= 0 then
                 self.dead = true
             end
@@ -153,7 +158,7 @@ function Boss:collides(player)
     end
 end
 
-function Boss:collidesWithPlayer(player)
+function Boss:laserCollidesWithPlayer()
     if player.x < self.laserX + self.laserWidth and
         self.laserX < player.x + player.width and
         player.y < self.laserY + self.laserHeight and
@@ -162,7 +167,9 @@ function Boss:collidesWithPlayer(player)
         player.collided = true
         -- sounds['player_dead']:setVolume(0.5)
         -- sounds['player_dead']:play()
-        player:decreaseLife()
+        if not player.dead then
+            player:decreaseLife()
+        end
     end
 end
 
@@ -205,7 +212,8 @@ function Boss:shootTrackingRocket(dt)
     if self.trackingRocketTimer >= self.trackingRocketInterval then
         self.shootingTrackingRocket = true
         --self.shotX = self.x + 64
-        self.trackingRocket = TrackingRocket(self.x, self.y)
+        --self.trackingRocket = TrackingRocket(self.x, self.y)
+        table.insert(self.trackingRockets, TrackingRocket(self.x, self.y))
         self.trackingRocketTimer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)

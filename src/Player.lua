@@ -27,7 +27,7 @@ function Player:init()
     self.y = WINDOW_HEIGHT - 100
     self.dx = 300
     self.dy = 450
-    self.life = 4
+    self.life = 400
 
     self.shotX = 0
     self.bombs = {}
@@ -45,6 +45,7 @@ function Player:update(dt)
     self.explosion.x = self.x
     self.explosion.y = self.y
     if self.life == 0 then
+        self.bombs = {}
         self.dead = true
     end
     if not self.dead then
@@ -90,7 +91,7 @@ function Player:render()
         self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
     else
-        self.explosion:render(1,1)
+        self.explosion:render(1, 1)
     end
 
     if self.shooting == true then
@@ -106,7 +107,7 @@ function Player:autoShoot(dt)
     if not self.dead then
         self.timer = self.timer + dt * 2
         if self.timer >= self.fireRate then
-            print(self.fireRate)
+            --print(self.fireRate)
             self.shooting = true
             self.shotX = self.x
             table.insert(self.bombs, Bomb(self.shotX))
@@ -143,8 +144,10 @@ function Player:increaseLife()
 end
 
 function Player:decreaseLife()
-    self.life = self.life - 1
-    print("life " .. self.life)
+    if self.life > 0 then
+        self.life = self.life - 1
+        print("life " .. self.life)
+    end
 end
 
 function Player:increaseShootingSpeed()
