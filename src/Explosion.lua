@@ -14,6 +14,6 @@ function Explosion:update(dt)
     self.firstAnimation:update(dt)
 end
 
-function Explosion:render()
-    self.firstAnimation:draw(self.explosion, self.x, self.y)
+function Explosion:render(scalex, scaley)
+    self.firstAnimation:draw(self.explosion, self.x, self.y, 0, scalex, scaley)
 end

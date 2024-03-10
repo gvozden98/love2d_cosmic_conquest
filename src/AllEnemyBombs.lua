@@ -24,7 +24,7 @@ function AllEnemyBombs:update(dt)
 end
 
 function AllEnemyBombs:render()
-    self.explosion:render()
+    self.explosion:render(1, 1)
     for index, bomb in ipairs(allEnemyBombs) do
         bomb:render()
     end

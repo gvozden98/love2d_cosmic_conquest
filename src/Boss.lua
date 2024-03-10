@@ -103,7 +103,7 @@ function Boss:update(dt)
         self:shootLaser(dt)
         self:shootTrackingRocket(dt)
     end
-    print(self.trackingRocket.dx)
+    --print(self.trackingRocket.dx)
     self.trackingRocket:update(dt, self.player)
 end
 

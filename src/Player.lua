@@ -90,7 +90,7 @@ function Player:render()
         self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
     else
-        self.explosion:render()
+        self.explosion:render(1,1)
     end
 
     if self.shooting == true then
