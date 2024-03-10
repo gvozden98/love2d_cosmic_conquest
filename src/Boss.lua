@@ -1,9 +1,11 @@
 require '/src/EnemyBomb'
 require '/src/Explosion'
+require '/src/TrackingRocket'
 Boss = class()
 
 
-function Boss:init(x, y, sprite, dead, bombSprite)
+function Boss:init(x, y, sprite, dead, bombSprite, player)
+    self.player = player
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/boss/boss.png")
     self.width = 128
     self.height = 128
@@ -54,10 +56,27 @@ function Boss:init(x, y, sprite, dead, bombSprite)
     self.laserInterval = 5
     self.laser = love.graphics.newImage("assets/sprites/boss/MegaLaserSheetLong.png")
     self.gridLaser = anim8.newGrid(self.laserWidth, self.laserHeight, self.laser:getWidth(), self.laser:getHeight())
-    self.frames = self.gridLaser(1, '1-4', 1, '4-1')
+    self.laserFrames = self.gridLaser(1, '1-4', 1, '4-1')
     --{ ['1-3'] = 0.05, ['4-5'] = 0.2, ['6-8'] = 0.05 } frames 1-3 and 6-8 will go on for 0.05s while 4 and 5 will go on for 0.2s
-    self.laserAnimation = anim8.newAnimation(self.frames,
+    self.laserAnimation = anim8.newAnimation(self.laserFrames,
         { ['1-3'] = 0.20, ['4-5'] = self.laserAnimationTimer, ['6-8'] = 0.10 })
+
+    --------Tracking Bomb
+    self.trackingRocket = TrackingRocket(self.x, self.y)
+    self.trackingRocketAnimationTimer = 0.5 --perfect time for laser animation
+    self.trackingRocketTimer = 0
+    self.minTrackingRocketInterval = 1
+    self.maxTrackingRocketInterval = 2
+    self.shootingTrackingRocket = false
+    self.trackingRocketInterval = 5
+    self.trackingRocketWidth = 32
+    self.trackingRocketHeight = 32
+    -- self.trackingRocket = love.graphics.newImage("assets/sprites/boss/trackingRocket.png")
+    -- self.gridTrackingRocket = anim8.newGrid(self.trackingRocketWidth, self.trackingRocketHeight,
+    --     self.trackingRocket:getWidth(),
+    --     self.trackingRocket:getHeight())
+    -- self.trackingRocketFrames = self.gridTrackingRocket(1, 1, 1, 2, 1, 3, 1, 4)
+    -- self.trackingRocketAnimation = anim8.newAnimation(self.trackingRocketFrames, 0.08, 'pauseAtEnd')
 
     --moving
     self.movingTimer = 0
@@ -73,6 +92,7 @@ function Boss:update(dt)
     self.destructionAnimation:update(dt)
     self.engineAnimation:update(dt)
     self.laserAnimation:update(dt)
+
     for k, explosion in pairs(self.explosions) do
         explosion:update(dt)
     end
@@ -81,7 +101,10 @@ function Boss:update(dt)
         self.y = self.y + self.dy * dt * self.downOrUp
         self:move(dt)
         self:shootLaser(dt)
+        self:shootTrackingRocket(dt)
     end
+    print(self.trackingRocket.dx)
+    self.trackingRocket:update(dt, self.player)
 end
 
 function Boss:render()
@@ -94,6 +117,10 @@ function Boss:render()
         if self.shootingLaser then
             --self.rayAnimation:draw(self.ray, self.x, self.y)
             self.laserAnimation:draw(self.laser, self.x + self.laserOffsetX, self.y + self.laserOffsetY)
+        end
+        if self.shootingTrackingRocket then
+            --self.trackingRocketAnimation:draw(self.trackingRocket, self.x + 128, self.y + 64)
+            self.trackingRocket:render()
         end
 
         love.graphics.draw(self.enemySpritesheet, self.x, self.y)
@@ -170,6 +197,20 @@ function Boss:shootLaser(dt)
         sounds['laser']:stop()
         sounds['laser']:setVolume(0.8)
         sounds['laser']:play()
+    end
+end
+
+function Boss:shootTrackingRocket(dt)
+    self.trackingRocketTimer = self.trackingRocketTimer + dt
+    if self.trackingRocketTimer >= self.trackingRocketInterval then
+        self.shootingTrackingRocket = true
+        --self.shotX = self.x + 64
+        self.trackingRocket = TrackingRocket(self.x, self.y)
+        self.trackingRocketTimer = 0
+        sounds['enemy_shoot']:stop()
+        sounds['enemy_shoot']:setVolume(0.5)
+        sounds['enemy_shoot']:play()
+        self.interval = love.math.random(self.minInterval, self.maxInterval)
     end
 end
 

@@ -7,6 +7,7 @@ function Enemies:init(type, isBoss, sprite, bombSprite)
     self.type = type or 1
     self.isBoss = isBoss
     self.bombSprite = bombSprite
+    self.player = player
 end
 
 function Enemies:getSprite()
@@ -29,5 +30,5 @@ function Enemies:populate(startX, rows)
 end
 
 function Enemies:populateBoss()
-    table.insert(self.enemies, Boss(236, 64, self.enemySpritesheet, false, "assets/sprites/bomb.png"))
+    table.insert(self.enemies, Boss(236, 64, self.enemySpritesheet, false, "assets/sprites/bomb.png", self.player))
 end
