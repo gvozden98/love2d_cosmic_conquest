@@ -7,7 +7,7 @@ function PowerUp:init(x, y, lifeOrPowerUp)
     self.lifeOrPowerUp = lifeOrPowerUp
     self.x = x
     self.y = y
-    self.dy = 200
+    self.dy = 250
     self.collided = false
 end
 

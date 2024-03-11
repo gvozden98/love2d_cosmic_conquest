@@ -75,7 +75,7 @@ function love.update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
     if gameState == "fight" or gameState == "dead" then
-        player:autoShoot(dt)
+        --player:autoShoot(dt)
         for key, enemy in pairs(enemies) do
             enemy:collides()
             enemy:shoot(dt)
@@ -120,7 +120,7 @@ function love.update(dt)
         end
         --player:speedUp(dt)
         if transitionTimer > 2 then
-            player:reset()
+            --player:reset()
             --print(transitionTimer)
             gameState = "fight"
             transitionTimer = 0

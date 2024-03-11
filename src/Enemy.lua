@@ -1,6 +1,6 @@
 require '/src/EnemyBomb'
 Enemy = class {}
-
+local movementSpeed = 100
 function Enemy:init(quad, x, y, bombSprite)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.quad = quad
@@ -23,6 +23,7 @@ function Enemy:init(quad, x, y, bombSprite)
 
     --movement
     self.moveTimer = 5
+    self.moveLinearTimer = math.random(1, 10)
 end
 
 function Enemy:update(dt)
@@ -45,7 +46,7 @@ end
 --     self.y < bomb.bomby + self.height and
 --     bomb.bomby < self.y + 3
 -- end
-function Enemy:collides(player)
+function Enemy:collides()
     for index, bomb in ipairs(player.bombs) do
         if self.x < bomb.bombx + 3 and
             bomb.bombx < self.x + self.width and
@@ -79,23 +80,39 @@ function Enemy:move(dt)
     self.x = self.x + self.dx * dt
     self.y = self.y + self.dy * dt
     self.moveTimer = self.moveTimer + dt
-    --print(self.moveTimer)
-    if self.moveTimer > 5 then
+    self.moveLinearTimer = self.moveLinearTimer + dt
+
+    if self.x >= 600 - self.width - 5 then
+        self.dx = self.dx * -1
+        self:checkDy()
+    end
+    if self.x <= 0 then
+        self.dx = self.dx * -1
+        self:checkDy()
+    end
+    if self.y >= 500 then
+        self.dy = self.dy * -1
+        self:checkDx()
+    end
+    if self.y <= self.width then
+        self.dy = self.dy * -1
+        self:checkDx()
+    end
+    if self.moveTimer > 5 and (self.x >= 48 and self.x <= 600 - self.width - 64) then
         self.dx = self.dx * self:random()
         self.dy = self.dy * self:random()
         self.moveTimer = 0
     end
-    if self.x >= 600 - self.width - 5 then
-        self.dx = self.dx * -1
-    end
-    if self.x <= 5 then
-        self.dx = self.dx * -1
-    end
-    if self.y >= 500 then
-        self.dy = self.dy * -1
-    end
-    if self.y <= self.width then
-        self.dy = self.dy * -1
+    if ((self.x > 100 and self.x < 500) and (self.y < 350 and self.y > 100)) and self.moveLinearTimer > 10 then
+        local random = self:random()
+        if random == 1 then
+            self.dx = 0
+            self:checkDy()
+        else
+            self.dy = 0
+            self:checkDx()
+        end
+        self.moveLinearTimer = 0
     end
 end
 
@@ -107,5 +124,21 @@ function Enemy:random()
         return -1
     elseif x > 0 then
         return 1
+    end
+end
+
+function Enemy:checkDy()
+    if self.dy < 0 then
+        self.dy = -100
+    else
+        self.dy = 100
+    end
+end
+
+function Enemy:checkDx()
+    if self.dx < 0 then
+        self.dx = -100
+    else
+        self.dx = 100
     end
 end

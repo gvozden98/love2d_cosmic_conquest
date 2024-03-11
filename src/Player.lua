@@ -50,15 +50,15 @@ function Player:update(dt)
     end
     if not self.dead then
         if love.keyboard.isDown('left') then
-            if self.x <= self.width - 43 then
-                self.x = self.width - 43
+            if self.x <= self.width - 51 then
+                self.x = self.width - 51
             else
                 self.x = self.x - self.dx * dt
             end
         end
         if love.keyboard.isDown('right') then
-            if self.x >= WINDOW_WIDTH - self.width - self.width + 43 then
-                self.x = WINDOW_WIDTH - self.width - self.width + 43
+            if self.x >= WINDOW_WIDTH - self.width - self.width + 51 then
+                self.x = WINDOW_WIDTH - self.width - self.width + 51
             else
                 self.x = self.x + self.dx * dt
             end

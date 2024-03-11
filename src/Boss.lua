@@ -38,7 +38,7 @@ function Boss:init(x, y, sprite, dead, bombSprite, player)
     self.timer = 0
     self.minInterval = 0.3
     self.maxInterval = 0.5
-    self.interval = 0.3
+    self.interval = 0.15
     self.bombSprite = bombSprite
 
     --------Laser
@@ -183,7 +183,8 @@ function Boss:shoot(dt)
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)
         sounds['enemy_shoot']:play()
-        self.interval = love.math.random(self.minInterval, self.maxInterval)
+        self.interval = love.math.random(1, 50) / 100
+        print(self.interval)
     end
 end
 
