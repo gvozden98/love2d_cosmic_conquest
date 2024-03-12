@@ -38,8 +38,11 @@ _G.allEnemyBombs = {}
 local explosions = {}
 local finish = false
 local powerUps = {}
+----------------------------music
+
 
 function love.load()
+
     AllEnemyBombs:init()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
@@ -62,8 +65,7 @@ function love.load()
 end
 
 function love.update(dt)
-    --check collision with the enemies
-    --print(dt)
+
     if currentLevel > #levels - 1 then
         gameState = "finish"
         if finish == false then

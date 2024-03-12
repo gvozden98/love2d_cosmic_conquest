@@ -1,15 +1,15 @@
 require '/src/EnemyBomb'
 Enemy = class {}
 local movementSpeed = 100
-function Enemy:init(quad, x, y, bombSprite)
+function Enemy:init(quad, x, y, bombSprite, speed, minInterval, maxInterval)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.quad = quad
     self.width = 32
     self.height = 32
     self.x = x
     self.y = y
-    self.dx = 100
-    self.dy = 100
+    self.dx = speed
+    self.dy = speed
     self.collided = false
     self.shotX = 0
     self.bombs = {}
@@ -17,8 +17,8 @@ function Enemy:init(quad, x, y, bombSprite)
     self.bombSprite = bombSprite
     --shooting variables
     self.timer = 0
-    self.minInterval = 2
-    self.maxInterval = 6
+    self.minInterval = minInterval
+    self.maxInterval = maxInterval
     self.interval = love.math.random(self.minInterval, self.maxInterval)
 
     --movement

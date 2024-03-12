@@ -20,10 +20,11 @@ function Enemies:getSprite()
 end
 
 --populate a level with rows of enemies, starting from startX pixels from the left and separated by 64 pixels from the top
-function Enemies:populate(startX, rows)
+function Enemies:populate(startX, rows, speed, minInterval, maxInterval)
     while rows > 0 do
         for i = startX, 600, 64 do
-            table.insert(self.enemies, Enemy(self.quads[self.type], i, rows * 64, self.bombSprite))
+            table.insert(self.enemies,
+                Enemy(self.quads[self.type], i, rows * 64, self.bombSprite, speed, minInterval, maxInterval))
         end
         rows = rows - 1
     end

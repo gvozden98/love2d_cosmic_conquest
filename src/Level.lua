@@ -15,7 +15,7 @@ end
 function Level:populate()
     print(#self.generatedEnemies)
     self.enemies:getSprite() -- need to modify populate function to choose a sprite
-    self.enemies:populate(self.startingXWhereEnemiesSpawn, self.numberOfRowsOfEnemies)
+    self.enemies:populate(self.startingXWhereEnemiesSpawn, self.numberOfRowsOfEnemies, 100, 2, 6)
     self.generatedEnemies = self.enemies.enemies
     print(#self.generatedEnemies)
 end
@@ -29,8 +29,10 @@ end
 
 return {
     --Level(Enemies(1, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png"), 32, 1, false),
-    --Level(Enemies(2, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png"), 32, 1, false),
-    --Level(Enemies(4, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png"), 32, 4, false),
+    Level(Enemies(2, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 500, 1, 3), 32, 1,
+        false),
+    Level(Enemies(4, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 100, 2, 6), 32, 4,
+        false),
     Level(Enemies(1, true, "assets/sprites/boss/boss.png", "assets/sprites/bomb.png"), 128, 1, true),
     Level(Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png"), 32, 1, false),
     --Level(Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png"), 32, 1, false),
