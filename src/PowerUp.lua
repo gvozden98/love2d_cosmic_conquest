@@ -36,6 +36,8 @@ function PowerUp:collidesWithPlayer(player)
             player:increaseLife()
         else
             player:increaseShootingSpeed()
+            player:increaseSpeed()
+            print(player.dx)
         end
     end
     return true

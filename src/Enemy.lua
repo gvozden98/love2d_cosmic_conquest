@@ -1,13 +1,14 @@
 require '/src/EnemyBomb'
 Enemy = class {}
 local movementSpeed = 100
-function Enemy:init(quad, x, y, bombSprite, speed, minInterval, maxInterval)
+function Enemy:init(quad, x, y, bombSprite, speed, minInterval, maxInterval, shootingSpeed)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/enemy_spaceships_sheet.png")
     self.quad = quad
     self.width = 32
     self.height = 32
     self.x = x
     self.y = y
+    self.speed = speed
     self.dx = speed
     self.dy = speed
     self.collided = false
@@ -16,6 +17,7 @@ function Enemy:init(quad, x, y, bombSprite, speed, minInterval, maxInterval)
     self.shooting = false
     self.bombSprite = bombSprite
     --shooting variables
+    self.shootingSpeed = shootingSpeed
     self.timer = 0
     self.minInterval = minInterval
     self.maxInterval = maxInterval
@@ -68,7 +70,7 @@ function Enemy:shoot(dt)
     if self.timer >= self.interval then
         self.shooting = true
         self.shotX = self.x
-        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y, self.bombSprite))
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y, self.bombSprite,self.shootingSpeed))
         self.timer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)
@@ -77,6 +79,7 @@ function Enemy:shoot(dt)
 end
 
 function Enemy:move(dt)
+    print(self.speed)
     self.x = self.x + self.dx * dt
     self.y = self.y + self.dy * dt
     self.moveTimer = self.moveTimer + dt
@@ -129,16 +132,16 @@ end
 
 function Enemy:checkDy()
     if self.dy < 0 then
-        self.dy = -100
+        self.dy = -self.speed
     else
-        self.dy = 100
+        self.dy = self.speed
     end
 end
 
 function Enemy:checkDx()
     if self.dx < 0 then
-        self.dx = -100
+        self.dx = -self.speed
     else
-        self.dx = 100
+        self.dx = self.speed
     end
 end

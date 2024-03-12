@@ -42,7 +42,6 @@ local powerUps = {}
 
 
 function love.load()
-
     AllEnemyBombs:init()
     love.graphics.setDefaultFilter("nearest", 'nearest')
     math.randomseed(os.time())
@@ -62,10 +61,16 @@ function love.load()
         ['transition'] = love.audio.newSource('sounds/transition.wav', 'static'),
         ['laser'] = love.audio.newSource('sounds/laser1.wav', 'static')
     }
+    _G.music = {
+        ['backgroundMusic'] = love.audio.newSource('sounds/music/background8bit.mp3'),
+        ['bossMusic'] = love.audio.newSource('sounds/music/bossMusic.mp3')
+    }
+
+    music['backgroundMusic']:setVolume(0.3)
+    music['backgroundMusic']:play()
 end
 
 function love.update(dt)
-
     if currentLevel > #levels - 1 then
         gameState = "finish"
         if finish == false then

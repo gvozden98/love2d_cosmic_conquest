@@ -156,6 +156,10 @@ function Player:increaseShootingSpeed()
     end
 end
 
+function Player:increaseSpeed()
+    self.dx = self.dx * 1.02
+end
+
 function Player:getHealth()
     if self.life == 4 then
         return love.graphics.draw(self.lifeSpritsheet, self.health1, 16, WINDOW_HEIGHT - 48)

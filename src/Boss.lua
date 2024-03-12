@@ -4,8 +4,7 @@ require '/src/TrackingRocket'
 Boss = class()
 
 
-function Boss:init(x, y, sprite, dead, bombSprite, player)
-    self.player = player
+function Boss:init(x, y, sprite, dead, bombSprite)
     self.enemySpritesheet = love.graphics.newImage("assets/sprites/boss/boss.png")
     self.width = 128
     self.height = 128
@@ -178,7 +177,7 @@ function Boss:shoot(dt)
     if self.timer >= self.interval then
         self.shooting = true
         self.shotX = self.x + 64
-        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y + self.width, self.bombSprite))
+        table.insert(allEnemyBombs, EnemyBomb(self.shotX, self.y + self.width, self.bombSprite, 450))
         self.timer = 0
         sounds['enemy_shoot']:stop()
         sounds['enemy_shoot']:setVolume(0.5)

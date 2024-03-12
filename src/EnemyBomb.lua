@@ -1,8 +1,8 @@
 EnemyBomb = class {}
 --local bomb = "bomb.png"
-function EnemyBomb:init(enemyX, enemyY, bombSprite)
+function EnemyBomb:init(enemyX, enemyY, bombSprite, speed)
     self.bomb = love.graphics.newImage(bombSprite)
-    self.bombdy = 300
+    self.bombdy = speed
     self.remove = false
     self.type = type or 1
     --[[    love.math.random() * coneAngle generates a random angle within the cone angle.
