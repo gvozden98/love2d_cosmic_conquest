@@ -79,7 +79,7 @@ function Enemy:shoot(dt)
 end
 
 function Enemy:move(dt)
-    print(self.speed)
+    --print(self.speed)
     self.x = self.x + self.dx * dt
     self.y = self.y + self.dy * dt
     self.moveTimer = self.moveTimer + dt

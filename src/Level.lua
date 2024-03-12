@@ -19,43 +19,63 @@ function Level:populate()
 end
 
 function Level:populateBoss()
-    print(#self.generatedEnemies)
+    --print(#self.generatedEnemies)
     self.enemies:populateBoss()
     self.generatedEnemies = self.enemies.enemies
-    print(#self.generatedEnemies)
+    --print(#self.generatedEnemies)
+    --print("boss")
+    music['backgroundMusic']:stop()
+    music['backgroundMusic']:setLooping(false)
+
+    music['bossMusic']:setVolume(0.4)
+    music['bossMusic']:play()
+    music['bossMusic']:setLooping(true)
 end
 
 return {
-    Level(Enemies(1, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 100, 2, 6, 300), 32,
+    Level(
+        Enemies(1, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/orangeBomb.png", 100, 2, 6,
+            300),
+        32,
         1,
         false),
-    Level(Enemies(2, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 110, 2, 5, 350), 32,
+    Level(
+        Enemies(2, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/frostBomb.png", 110, 2, 5,
+            350), 32,
         2,
         false),
-    Level(Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 125, 2, 4, 375), 32,
+    Level(
+        Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/frostBall.png", 125, 2, 4,
+            375), 32,
         3,
         false),
-    Level(Enemies(4, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 150, 1, 3, 400), 32,
+    Level(
+        Enemies(4, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/purpleBomb.png", 150, 2, 4,
+            400), 32,
         4,
         false),
-    Level(Enemies(5, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 175, 1, 2, 425), 32,
+    Level(
+        Enemies(5, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/darkRedBomb.png", 175, 2, 4,
+            425), 32,
         3,
         false),
-    Level(Enemies(6, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 200, 1, 2, 450), 32,
+    Level(
+        Enemies(6, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/greenBomb.png", 200, 2, 4,
+            450), 32,
         3,
         false),
-    Level(Enemies(7, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 250, 1, 2, 450), 32,
+    Level(
+        Enemies(7, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/greenMovingBomb.png", 210, 1,
+            3, 450), 32,
         3,
         false),
-    Level(Enemies(8, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png", 275, 2, 6, 450), 32,
+    Level(
+        Enemies(8, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/purpleMovingBomb.png", 220,
+            1, 3, 450), 32,
         4,
         false),
     Level(Enemies(1, true, "assets/sprites/boss/boss.png", "assets/sprites/bomb.png"), 128, 1, true),
     Level(Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bomb.png"), 32, 1, false),
-    --Level(Enemies(3, false, "assets/sprites/enemy_spaceships_sheet.png"), 32, 1, false),
 
-
-    -- Level(Enemies(4), 32, 3,false),
-    -- Level(Enemies(5), 32, 4,false),
 
 }

@@ -1,7 +1,11 @@
 EnemyBomb = class {}
 --local bomb = "bomb.png"
 function EnemyBomb:init(enemyX, enemyY, bombSprite, speed)
+    --self.bomb = love.graphics.newImage(bombSprite)
     self.bomb = love.graphics.newImage(bombSprite)
+    self.enemyBombGrid = anim8.newGrid(16, 16, self.bomb:getWidth(), self.bomb:getHeight())
+    self.bombFrames = self.enemyBombGrid(1, 1, 1, 2, 1, 3, 1, 4)
+    self.bombAnimation = anim8.newAnimation(self.bombFrames, 0.08)
     self.bombdy = speed
     self.remove = false
     self.type = type or 1
@@ -20,6 +24,7 @@ function EnemyBomb:init(enemyX, enemyY, bombSprite, speed)
 end
 
 function EnemyBomb:update(dt)
+    self.bombAnimation:update(dt)
     if self.bomby >= 820 then
         self.remove = true
     end
@@ -32,7 +37,8 @@ end
 
 function EnemyBomb:render()
     if not self.remove then
-        love.graphics.draw(self.bomb, self.bombx, self.bomby)
+        self.bombAnimation:draw(self.bomb, self.bombx, self.bomby)
+        --love.graphics.draw(self.bomb, self.bombx, self.bomby)
     end
 end
 

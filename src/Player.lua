@@ -27,7 +27,7 @@ function Player:init()
     self.y = WINDOW_HEIGHT - 100
     self.dx = 300
     self.dy = 450
-    self.life = 400
+    self.life = 4
 
     self.shotX = 0
     self.bombs = {}
@@ -119,12 +119,12 @@ function Player:autoShoot(dt)
 end
 
 function Player:shoot()
-    self.shooting = true
-    self.shotX = self.x
-    table.insert(self.bombs, Bomb(self.shotX))
-    sounds['shoot']:stop()
-    sounds['shoot']:setVolume(0.3)
-    sounds['shoot']:play()
+    -- self.shooting = true
+    -- self.shotX = self.x
+    -- table.insert(self.bombs, Bomb(self.shotX))
+    -- sounds['shoot']:stop()
+    -- sounds['shoot']:setVolume(0.3)
+    -- sounds['shoot']:play()
 end
 
 function Player:speedUp(dt)

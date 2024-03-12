@@ -24,7 +24,7 @@ end
 
 --populate a level with rows of enemies, starting from startX pixels from the left and separated by 64 pixels from the top
 function Enemies:populate(startX, rows)
-    print(self.speed)
+    --print(self.speed)
     while rows > 0 do
         for i = startX, 600, 64 do
             table.insert(self.enemies,
@@ -36,5 +36,5 @@ function Enemies:populate(startX, rows)
 end
 
 function Enemies:populateBoss()
-    table.insert(self.enemies, Boss(236, 64, self.enemySpritesheet, false, "assets/sprites/bomb.png"))
+    table.insert(self.enemies, Boss(236, 64, self.enemySpritesheet, false, "assets/sprites/boss/boss_Bomb.png"))
 end

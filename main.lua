@@ -62,11 +62,12 @@ function love.load()
         ['laser'] = love.audio.newSource('sounds/laser1.wav', 'static')
     }
     _G.music = {
-        ['backgroundMusic'] = love.audio.newSource('sounds/music/background8bit.mp3'),
-        ['bossMusic'] = love.audio.newSource('sounds/music/bossMusic.mp3')
+        ['backgroundMusic'] = love.audio.newSource('sounds/music/background8bit.mp3', 'stream'),
+        ['bossMusic'] = love.audio.newSource('sounds/music/bossMusic.mp3', 'stream')
     }
 
     music['backgroundMusic']:setVolume(0.3)
+    music['backgroundMusic']:setLooping(true)
     music['backgroundMusic']:play()
 end
 
@@ -82,13 +83,20 @@ function love.update(dt)
     AllEnemyBombs:update(dt)
     AllEnemyBombs:collidesWithPlayer(player)
     if gameState == "fight" or gameState == "dead" then
-        --player:autoShoot(dt)
+        player:autoShoot(dt)
         for key, enemy in pairs(enemies) do
             enemy:collides()
             enemy:shoot(dt)
             enemy:update(dt)
             if enemy.collided == true then
                 if currentLevelData.isBoss then
+                    print("boss")
+                    music['backgroundMusic']:stop()
+                    music['backgroundMusic']:setLooping(false)
+
+                    music['bossMusic']:setVolume(0.4)
+                    music['bossMusic']:play()
+                    music['bossMusic']:setLooping(true)
                     if enemy.dead then
                         table.remove(enemies, key)
                         table.insert(explosions, Boss(enemy.x, enemy.y, "", true))
@@ -240,6 +248,13 @@ function love.keypressed(key)
     end
     if gameState == "dead" then
         if key == 'return' then
+            if currentLevelData.isBoss then
+                music['bossMusic']:stop()
+                music['backgroundMusic']:setVolume(0.3)
+                music['backgroundMusic']:setLooping(true)
+                music['backgroundMusic']:play()
+            end
+            enemies = {}
             levels[currentLevel].enemies.enemies = {}
             player = Player()
             currentLevel = 1
@@ -247,11 +262,16 @@ function love.keypressed(key)
             LoadLevel(currentLevel)
             finish = false
             backgroundY = -2200
+            print("sta se savade")
             gameState = "fight"
         end
     end
     if gameState == "finish" then
         if key == 'return' then
+            music['bossMusic']:stop()
+            music['backgroundMusic']:setVolume(0.3)
+            music['backgroundMusic']:setLooping(true)
+            music['backgroundMusic']:play()
             levels[currentLevel].enemies.enemies = {}
             player = Player()
             currentLevel = 1
@@ -275,7 +295,7 @@ function LoadLevel(level)
         currentLevelData:populateBoss()
     end
 
-    enemies = currentLevelData.generatedEnemies
+    enemies = currentLevelData.enemies.enemies
 
     --print(#currentLevelData.generatedEnemies)
 end

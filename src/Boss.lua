@@ -84,6 +84,7 @@ function Boss:init(x, y, sprite, dead, bombSprite)
     self.movingInterval = 1.5
     self.leftOrRight = -1
     self.downOrUp = -1
+    print(self.bo)
 end
 
 function Boss:update(dt)
@@ -183,7 +184,7 @@ function Boss:shoot(dt)
         sounds['enemy_shoot']:setVolume(0.5)
         sounds['enemy_shoot']:play()
         self.interval = love.math.random(1, 50) / 100
-        print(self.interval)
+        --print(self.interval)
     end
 end
 
