@@ -10,4 +10,5 @@ function love.conf(t)
     t.modules.sound = true             -- Enable sound module
     t.modules.image = true             -- Enable image module
     t.modules.graphics = true          -- Enable graphics module
+    t.console = false
 end

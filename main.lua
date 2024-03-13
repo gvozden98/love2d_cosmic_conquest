@@ -90,7 +90,6 @@ function love.update(dt)
             enemy:update(dt)
             if enemy.collided == true then
                 if currentLevelData.isBoss then
-                    print("boss")
                     music['backgroundMusic']:stop()
                     music['backgroundMusic']:setLooping(false)
 
@@ -104,10 +103,14 @@ function love.update(dt)
                 end
                 if not currentLevelData.isBoss then
                     if math.random(1, 100) < 20 then
-                        if math.random(-1, 1) < 0 then
-                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, true))
-                        else
-                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, false))
+                        local randomPowerUp = math.random(1, 10)
+                        if randomPowerUp < 3 then
+                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, 1))
+                        elseif randomPowerUp >= 3 and randomPowerUp <= 6 then
+                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, 2))
+                        elseif randomPowerUp >= 9 and randomPowerUp <= 10 then
+                            print("another gun")
+                            table.insert(powerUps, PowerUp(enemy.x, enemy.y, 3))
                         end
                     end
                     table.remove(enemies, key)
@@ -164,7 +167,6 @@ function love.update(dt)
     end
     --print(gameState)
     if backgroundY > -800 then
-        print("aaaa")
         backgroundY = -2200
         background = love.graphics.newImage("/assets/sprites/Space_Background_long2.png")
     end
@@ -262,7 +264,7 @@ function love.keypressed(key)
             LoadLevel(currentLevel)
             finish = false
             backgroundY = -2200
-            print("sta se savade")
+
             gameState = "fight"
         end
     end

@@ -38,7 +38,7 @@ function AllEnemyBombs:collidesWithPlayer(player)
             enemyBomb.bomby < player.y + player.height
         then
             --if collided then remove the bomb
-            if not player.dead then
+            if not player.dead and not player.immune then
                 if player.life > 1 then
                     self.explosion = Explosion(player.x + 8, player.y + 8, 1, 0.03)
                     sounds['boom']:stop()
@@ -48,9 +48,11 @@ function AllEnemyBombs:collidesWithPlayer(player)
                     sounds['player_dead']:setVolume(0.5)
                     sounds['player_dead']:play()
                 end
-                player.collided = true
+
                 player:decreaseLife()
+                player.collided = true
                 enemyBomb.remove = true
+                player.immune = true
             end
         end
     end

@@ -16,7 +16,7 @@ function Boss:init(x, y, sprite, dead, bombSprite)
     self.shooting = false
     self.dx = 150
     self.dy = 100
-    self.life = 25
+    self.life = 100
     self.dead = dead
     self.explosions = {}
 
@@ -84,7 +84,6 @@ function Boss:init(x, y, sprite, dead, bombSprite)
     self.movingInterval = 1.5
     self.leftOrRight = -1
     self.downOrUp = -1
-    print(self.bo)
 end
 
 function Boss:update(dt)
@@ -143,12 +142,12 @@ function Boss:collides()
             self.y - 20 < bomb.bomby + 3 and
             bomb.bomby < self.y - 20 + self.height - 20
         then
+            self.collided = true
+            bomb.remove = true
+            self:decreaseLife()
             sounds['boom']:stop()
             sounds['boom']:setVolume(0.4)
             sounds['boom']:play()
-            self.collided = true
-            bomb.remove = true
-            self.life = self.life - 1
             table.insert(self.explosions, Explosion(bomb.bombx, bomb.bomby, 10, 0.03))
             print(self.life .. " " .. "player hit the boss")
             if self.life <= 0 then
@@ -231,7 +230,7 @@ function Boss:move(dt)
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
-    if self.x >= 500 then
+    if self.x >= 350 then
         self.leftOrRight = -1
         self.movingTimer = 0
         self.dx = self:randomSpeed()
@@ -243,7 +242,7 @@ function Boss:move(dt)
         self.dx = self:randomSpeed()
         self.dy = self:randomSpeed()
     end
-    if self.y >= 500 then
+    if self.y >= 350 then
         self.downOrUp = -1
         self.movingTimer = 0
         self.dx = self:randomSpeed()
@@ -267,4 +266,8 @@ end
 function Boss:laserPosition()
     self.laserX = self.x + self.laserOffsetX
     self.laserY = self.y + self.laserOffsetY
+end
+
+function Boss:decreaseLife()
+    self.life = self.life - 1
 end

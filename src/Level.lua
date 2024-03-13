@@ -71,7 +71,7 @@ return {
         false),
     Level(
         Enemies(8, false, "assets/sprites/enemy_spaceships_sheet.png", "assets/sprites/bombs/purpleMovingBomb.png", 220,
-            1, 3, 450), 32,
+            1, 3, 250), 32,
         4,
         false),
     Level(Enemies(1, true, "assets/sprites/boss/boss.png", "assets/sprites/bomb.png"), 128, 1, true),

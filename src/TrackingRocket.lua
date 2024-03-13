@@ -71,10 +71,7 @@ function TrackingRocket:collidesWithPlayer()
         self.y < player.y + player.height
     then
         --if collided then remove the bomb
-        if not player.dead then
-            print("aaaaaaaaaa")
-            self.collided = true
-            player.collided = true
+        if not player.dead and not player.immune then
             if player.life > 1 then
                 self.explosion = Explosion(player.x - 8, player.y - 8, 1, 0.03)
                 sounds['boom']:stop()
@@ -84,7 +81,10 @@ function TrackingRocket:collidesWithPlayer()
                 sounds['player_dead']:setVolume(0.5)
                 sounds['player_dead']:play()
             end
+            self.collided = true
+            player.collided = true
             player:decreaseLife()
+            player.immune = true
         end
     end
 end

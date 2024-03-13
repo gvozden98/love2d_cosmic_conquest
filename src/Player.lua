@@ -29,18 +29,28 @@ function Player:init()
     self.dy = 450
     self.life = 4
 
+
     self.shotX = 0
     self.bombs = {}
     self.explosion = Explosion(self.x, self.y, 2, 0.08)
     self.shooting = false
     self.collided = false
     self.dead = false
+    self.immune = false
+    self.immuneTimer = 1
+    self.immuneOpacity = 0.4
     --auto shooting
+    self.numberOfBombs = 1
     self.fireRate = 1.5
     self.timer = 0
 end
 
 function Player:update(dt)
+    if self.immune then
+        self.immuneTimer = self.immuneTimer - dt
+        --print(self.immuneTimer)
+    end
+    self:manageImmune()
     self.firstAnimation:update(dt)
     self.explosion.x = self.x
     self.explosion.y = self.y
@@ -88,8 +98,12 @@ function Player:render()
     -- can not get width of quad for some reason
     self:getHealth()
     if not self.dead then
+        if self.immune then
+            love.graphics.setColor(1, 1, 1, 0.5)
+        end
         self.firstAnimation:draw(self.thruster, self.x + 17, self.y + 38) --specific number to suite the ship specs
         love.graphics.draw(self.spritesheet, self.player1, self.x, self.y)
+        love.graphics.setColor(1, 1, 1, 1)
     else
         self.explosion:render(1, 1)
     end
@@ -104,24 +118,32 @@ function Player:render()
 end
 
 function Player:autoShoot(dt)
-    if not self.dead then
-        self.timer = self.timer + dt * 2
-        if self.timer >= self.fireRate then
-            --print(self.fireRate)
-            self.shooting = true
-            self.shotX = self.x
-            table.insert(self.bombs, Bomb(self.shotX))
-            self.timer = 0
-            sounds['shoot']:setVolume(0.5)
-            sounds['shoot']:play()
+    if self.dead then
+        return
+    end
+    self.timer = self.timer + dt * 2
+    if self.timer >= self.fireRate then
+        self.shooting = true
+        local x = 1;
+        for i = 1, self.numberOfBombs, 1 do
+            table.insert(self.bombs, Bomb(self.x - 8 * x, self.y + 3))
+            x = x * -1
+            if self.numberOfBombs == 3 then
+                table.insert(self.bombs, Bomb(self.x, self.y - 3))
+            end
         end
+        self.timer = 0
+        sounds['shoot']:setVolume(0.5)
+        sounds['shoot']:play()
+    end
+    if not self.dead then
+
     end
 end
 
 function Player:shoot()
     -- self.shooting = true
-    -- self.shotX = self.x
-    -- table.insert(self.bombs, Bomb(self.shotX))
+    -- table.insert(self.bombs, Bomb(self.x, self.y))
     -- sounds['shoot']:stop()
     -- sounds['shoot']:setVolume(0.3)
     -- sounds['shoot']:play()
@@ -144,20 +166,20 @@ function Player:increaseLife()
 end
 
 function Player:decreaseLife()
-    if self.life > 0 then
+    if self.life > 0 and not self.immune then
         self.life = self.life - 1
         print("life " .. self.life)
     end
 end
 
 function Player:increaseShootingSpeed()
-    if self.fireRate >= 0.5 then
+    if self.fireRate >= 0.4 then
         self.fireRate = self.fireRate - self.fireRate / 5
     end
 end
 
 function Player:increaseSpeed()
-    self.dx = self.dx * 1.02
+    self.dx = self.dx * 1.03
 end
 
 function Player:getHealth()
@@ -175,5 +197,19 @@ function Player:getHealth()
     end
     if self.life == 0 then
         return love.graphics.draw(self.lifeSpritsheet, self.health5, 16, WINDOW_HEIGHT - 48)
+    end
+end
+
+function Player:addBomb()
+    if self.numberOfBombs < 3 then
+        self.numberOfBombs = self.numberOfBombs + 1
+        print(self.numberOfBombs .. "bombi")
+    end
+end
+
+function Player:manageImmune()
+    if self.immuneTimer <= 0 then
+        self.immuneTimer = 1
+        self.immune = false
     end
 end
