@@ -103,12 +103,12 @@ function love.update(dt)
                 end
                 if not currentLevelData.isBoss then
                     if math.random(1, 100) < 20 then
-                        local randomPowerUp = math.random(1, 10)
+                        local randomPowerUp = math.random(1, 12)
                         if randomPowerUp < 3 then
                             table.insert(powerUps, PowerUp(enemy.x, enemy.y, 1))
                         elseif randomPowerUp >= 3 and randomPowerUp <= 6 then
                             table.insert(powerUps, PowerUp(enemy.x, enemy.y, 2))
-                        elseif randomPowerUp >= 9 and randomPowerUp <= 10 then
+                        elseif randomPowerUp >= 11 and randomPowerUp <= 12 then
                             print("another gun")
                             table.insert(powerUps, PowerUp(enemy.x, enemy.y, 3))
                         end
